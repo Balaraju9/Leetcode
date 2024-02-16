@@ -1,7 +1,7 @@
 class Solution {
 public:
     int findLeastNumOfUniqueInts(vector<int>& ar, int k) {
-        map<int,int> mp;
+        unordered_map<int,int> mp;
         for(auto &i:ar){
             mp[i]++;
         }
