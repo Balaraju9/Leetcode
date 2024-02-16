@@ -9,9 +9,7 @@ public:
         for(auto &i:mp){
             v1.push_back(i.second);
         }
-        for(auto &i:v1){
-            cout<<i<<" ";
-        }
+       
         sort(v1.begin(),v1.end());
         int l=0,s=0;
        for(int i=0;i<v1.size();i++){
@@ -19,14 +17,15 @@ public:
 
            if(s>=k){
                l=i;
-               cout<<l;
+               
 
                break;
            }
+
             
           
        }
-       int ba;
+       
        if(s==k){
             return (v1.size()-1)-l;
 
