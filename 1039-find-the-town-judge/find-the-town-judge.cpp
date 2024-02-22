@@ -1,5 +1,9 @@
 class Solution {
 public:
+    Solution(){
+         ios_base::sync_with_stdio(false);
+         cin.tie(NULL);
+    }
     int findJudge(int n, vector<vector<int>>& t) {
         if(n==1 && t.size()==0){
             return 1;
