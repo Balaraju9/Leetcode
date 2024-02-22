@@ -9,8 +9,8 @@ public:
             return 1;
         }
 
-        map<int,int> mp;
-        map<int,int> mp1;
+        unordered_map<int,int> mp;
+        unordered_map<int,int> mp1;
         for(auto &i:t){
             mp[i[0]]++;
             mp1[i[1]]++;
