@@ -26,18 +26,17 @@ public:
             
             
         }
-        vector<int> ba;
-        reverse(v1.begin(),v1.end());
         
-        for(int i=0;i<n1.size();i++){
-            for(int j=0;j<n2.size();j++){
-                if(n1[i]==n2[j]){
-                    ba.push_back(v1[j]);
-                    break;
-                }
-            }
-        }
-        return ba;
+        reverse(v1.begin(),v1.end());
+        unordered_map<int,int> mp;
+       for(int i=0;i<v1.size();i++){
+           mp[n2[i]]=v1[i];
+
+       }
+       for(int i=0;i<n1.size();i++){
+           n1[i]=mp[n1[i]];
+       }
+        return n1;
         
     }
 };
