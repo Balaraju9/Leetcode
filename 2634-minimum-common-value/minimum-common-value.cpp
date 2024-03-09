@@ -1,27 +1,27 @@
 class Solution {
 public:
     int getCommon(vector<int>& n1, vector<int>& n2) {
- map<int,int> mp;
- int n22=n2.size();
-    for(int i=0;i<n22;i++){
-        
-            mp[n2[i]]++;
+        int i=0,j=0,c=-9786;
 
-        
-    }
-    for(int i=0;i<n1.size();i++){
-        if(mp.find(n1[i])!=mp.end()){
-            return n1[i];
+        while(i<n1.size()&&j<n2.size()){
+            if(n1[i]==n2[j]){
+                c=n1[i];
+                break;
+            }
+            else if(n1[i]>n2[j]){
+                j++;
+
+            }
+            else{
+                i++;
+            }
+
         }
-    }
-    return -1;
+        if(c!=-9786){
+            return c;
+        }
+        return -1;
 
-    
-   
-
-
-    
-   
         
     }
 };
