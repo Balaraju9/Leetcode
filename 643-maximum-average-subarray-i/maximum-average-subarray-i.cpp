@@ -1,6 +1,9 @@
 class Solution {
 public:
     double findMaxAverage(vector<int>& n, int k) {
+        ios_base::sync_with_stdio(false);
+        cin.tie(NULL);
+        cout.tie(NULL);
         double max1=INT_MIN,s=0;
         int i=0,j=0;
         while(j<n.size()){
