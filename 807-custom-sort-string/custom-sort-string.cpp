@@ -1,6 +1,9 @@
 class Solution {
 public:
     string customSortString(string o, string s) {
+         ios_base::sync_with_stdio(false);
+        cin.tie(NULL);
+        cout.tie(NULL);
         map<int,char> mp;
         map<char,int> mp1;
         string s2="";
