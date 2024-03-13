@@ -11,6 +11,9 @@
 class Solution {
 public:
     ListNode* doubleIt(ListNode* h) {
+         ios_base::sync_with_stdio(false);
+        cin.tie(NULL);
+        cout.tie(NULL);
         ListNode *t=h,*temp=NULL,*prev=NULL;
 
         while(t!=NULL){
