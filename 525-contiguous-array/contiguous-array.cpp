@@ -7,7 +7,7 @@ public:
             }
         }
         int max1=0,s=0;
-        map<int,int> mp;
+        unordered_map<int,int> mp;
         for(int i=0;i<n.size();i++){
             s=s+n[i];
             if(s==0){
