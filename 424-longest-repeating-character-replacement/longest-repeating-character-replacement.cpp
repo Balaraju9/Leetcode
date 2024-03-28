@@ -2,7 +2,7 @@ class Solution {
 public:
     int characterReplacement(string s, int k) {
         int i=0,j=0,max1=0,max2=0;
-        map<char,int> mp;
+        unordered_map<char,int> mp;
         while(j<s.size()){
             mp[s[j]]++;
            
