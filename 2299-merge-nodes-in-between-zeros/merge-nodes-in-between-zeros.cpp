@@ -11,27 +11,24 @@
 class Solution {
 public:
     ListNode* mergeNodes(ListNode* h) {
-        ListNode *p=h;
-        ListNode *n=new ListNode(0);
-        ListNode *n1=n;
+        ListNode *p=h->next;
         int c=0;
+        ListNode *m=h;
         while(p){
             if(p->val==0){
-                n1->next=new ListNode(c);
-                n1=n1->next;
+                m->val=c;
+                m->next=p->next;
+                m=m->next;
                 c=0;
 
             }
             else{
-                c=c+p->val;
+                c+=p->val;
             }
             p=p->next;
         }
-        while(n->val==0){
-            n=n->next;
-        }
-        
-        return n;
+        return h;
+
         
     }
 };
