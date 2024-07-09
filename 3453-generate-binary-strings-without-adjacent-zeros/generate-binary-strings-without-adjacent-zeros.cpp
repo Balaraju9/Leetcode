@@ -3,6 +3,7 @@ public:
     void fun(int n,vector<string> &v1,string s){
         if(s.size()==n){
             v1.push_back(s);
+            s="";
            
             return;
         }
