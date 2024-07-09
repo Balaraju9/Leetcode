@@ -15,7 +15,7 @@ public:
             else{
                 k=(c[i][0]+c[i][1]);
             }
-            cout<<k<<" "<<"\n";
+           
             k1+=(k-c[i][0]);
         }
         return k1/c.size();
