@@ -18,8 +18,8 @@ map<int,int> mp;
         }
         mp[c]=root->val;
         rightview(root->left,c=c+1);
-        c=c-1;
-        rightview(root->right,c=c+1);
+     
+        rightview(root->right,c);
         
 
     }
