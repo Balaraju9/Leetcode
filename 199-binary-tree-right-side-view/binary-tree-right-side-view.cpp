@@ -17,9 +17,9 @@ map<int,int> mp;
             return;
         }
         mp[c]=root->val;
-        rightview(root->left,c=c+1);
+        rightview(root->left,c+1);
      
-        rightview(root->right,c);
+        rightview(root->right,c+1);
         
 
     }
