@@ -11,26 +11,25 @@
  */
 class Solution {
 public:
-int sul=0,z=0;
+    bool puk=true;
     int fun(TreeNode* root){
         if(root==NULL){
             return 0;
+
         }
-        z++;
-        int p1=1+fun(root->left);
-        int p2=1+fun(root->right);
-        if(abs(p1-p2)<=1){
-            sul++;
+        int l=1+fun(root->left);
+        int r=1+fun(root->right);
+        if(abs(l-r)>1){
+            puk=false;
+
         }
-       
+        return max(l,r);
         
-        return max(p1,p2);
     }
     bool isBalanced(TreeNode* root) {
-        
+        fun(root);
+        return puk;
 
-     fun(root);
-   return z==sul;
         
     }
 };
