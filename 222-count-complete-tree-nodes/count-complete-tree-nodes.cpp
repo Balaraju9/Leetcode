@@ -13,6 +13,10 @@ class Solution {
 public:
     int c=0;
     void fun(TreeNode* root){
+        if(root!=NULL && (root->left==NULL && root->right==NULL)){
+            c++;
+            return;
+        }
         if(root==NULL){
             return;
         }
