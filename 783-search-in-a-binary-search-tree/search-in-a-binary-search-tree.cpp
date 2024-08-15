@@ -20,8 +20,12 @@ TreeNode* pu
         if(root->val==val){
             pu=root;
         }
-        fun(root->right,val);
-        fun(root->left,val);
+          if(root->val>=val){
+        return fun(root->left,val);
+        }
+        if(root->val<val){
+        return fun(root->right,val);
+        }
     } 
     
     TreeNode* searchBST(TreeNode* root, int val) {
