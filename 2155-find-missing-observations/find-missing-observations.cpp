@@ -25,6 +25,13 @@ public:
         }
         sort(v1.begin(),v1.end());
         int i=0,j=v1.size()-1;
+        int jumn=0;
+        for(auto &i:v1){
+            jumn+=i;
+        }
+        if(jumn<v1.size()){
+            return {};
+        }
         while( i<v1.size() && j<v1.size() && i<=j){
             while(v1[j]>1 && v1[i]==0 && i<v1.size() && j<v1.size()){
                 v1[i]=1;
