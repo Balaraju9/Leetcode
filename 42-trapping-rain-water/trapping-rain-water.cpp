@@ -1,28 +1,31 @@
 class Solution {
 public:
     int trap(vector<int>& h) {
-        vector<int> pu(h.size());
-        vector<int> pu1(h.size());
-        int max=INT_MIN,max1=INT_MIN    ;
+        vector<int> v1(h.size());
+        vector<int> v2(h.size());
+        int max1=0;
+        for(int i=0;i<v1.size();i++){
+            v1[i]=max1;
+            max1=max(max1,h[i]);
+        }
+        max1=0;
+          for(int i=v2.size()-1;i>=0;i--){
+            v2[i]=max1;
+            max1=max(max1,h[i]);
+        }
+      
+        int ans=0;
+        int min1=0;
         for(int i=0;i<h.size();i++){
-            if(max<h[i]){
-                max=h[i];
+            min1=min(v1[i],v2[i]);
+            if(min1-h[i]>=1){
+
+            ans+=abs(min1-h[i]);
             }
-            pu[i]=max;
         }
-        for(int i=h.size()-1;i>=0;i--){
-            if(max1<h[i]){
-                max1=h[i];
-            }
-            pu1[i]=max1;
-        }
-        int s=0;
-        for(int i=0;i<h.size();i++){
-            int k=min(pu[i],pu1[i]);
-            s+=abs(k-h[i]);
-        }
-       
-        return s;
+        return ans;
+
+
         
     }
 };
