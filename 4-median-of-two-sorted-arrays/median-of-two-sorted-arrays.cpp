@@ -63,6 +63,8 @@ public:
                 c3++;
                 
             }
+              
+        return (c+c1)/2.0;
 
         }
         else{
@@ -121,9 +123,8 @@ public:
             return c/1.0;
 
         }
-        cout<<c<<" "<<c1;
-        double bal=(c+c1)/2.0;
-        return bal;
+      
+        return 0;
         
     }
 };
