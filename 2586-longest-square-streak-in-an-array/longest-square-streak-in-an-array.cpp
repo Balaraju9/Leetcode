@@ -15,9 +15,9 @@ public:
 
         int ans = -1;
         for(int i = 0; i < n.size(); i++) {
-            if(max1 >= static_cast<long long>(n[i]) * n[i] && mp.find(static_cast<long long>(n[i]) * n[i]) != mp.end()) {
+            if(max1 >= static_cast<long long>(n[i]) *static_cast<long long>(n[i]) && mp.find(static_cast<long long>(n[i]) * static_cast<long long>(n[i])) != mp.end()) {
                 int c = 0;
-                long long k = static_cast<long long>(n[i]) * n[i];
+                long long k = static_cast<long long>(n[i]) * static_cast<long long>(n[i]);
                 while(mp.find(k) != mp.end()) {
                     c++;
                     k = k * k;
