@@ -16,6 +16,7 @@ public:
                 s1+=s[i];
             }
         }
+        return s1;
         string s2="";
          for(int i=s.size()-1;i>=0;i--){
             if(s2.size()>=2){
