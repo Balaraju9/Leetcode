@@ -1,21 +1,18 @@
 class Solution {
 public:
-    string fun(string s,int k){
-        string s1="";
-        for(int i=0;i<s.size();i++){
-            int t=(i+k)%s.size();
-            s1+=s[t];
-            
-        }
-        return s1;
-    }
     bool rotateString(string s, string g) {
-        for(int i=0;i<s.size();i++){
-            if(fun(s,i)==g){
+        int x=100;
+        while(x--){
+            if(s==g){
                 return true;
             }
+            string z="";
+            z+=s[0];
+            s=s.substr(1,s.size());
+            s+=z;
+
+
         }
-        return false;
-        
+ return false;       
     }
 };
