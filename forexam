@@ -1,0 +1,101 @@
+from numpy import asarray
+from sklearn.preprocessing import MinMaxScaler
+from sklearn import datasets
+from sklearn.model_selection import train_test_split
+
+# Define the data
+data = asarray([[100, 0.001], [8, 0.05], [50, 0.005], [88, 0.07], [4, 0.1]])
+print("Original Data:\n", data)
+
+# Apply MinMaxScaler to scale the data
+scaler = MinMaxScaler()
+scaled = scaler.fit_transform(data)
+print("Scaled Data:\n", scaled)
+
+# Load the Iris dataset
+iris = datasets.load_iris()
+X = iris.data  # Features
+y = iris.target  # Labels
+
+# Split the dataset into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=1, stratify=y
+)
+
+# Normalize the training and testing data using MinMaxScaler
+scaler = MinMaxScaler()  # Initialize a new scaler
+X_train_norm = scaler.fit_transform(X_train)  # Fit and transform training data
+X_test_norm = scaler.transform(X_test)  # Transform testing data
+
+# Display the results
+print("\nNormalized X_train:\n", X_train_norm)
+print("\nNormalized X_test:\n", X_test_norm)
+------------------------------------------------------------------------
+from sklearn.preprocessing import Binarizer
+import pandas as pd
+
+# Load the dataset
+url = "https://raw.githubusercontent.com/jbrownlee/Datasets/master/pima-indians-diabetes.csv"
+colnames = ['preg', 'plas', 'pres', 'skin', 'test', 'mass', 'pedi', 'age', 'class']
+data = pd.read_csv(url, names=colnames)
+
+# Display the first 5 rows of the dataset
+print("Data:\n", data.head())
+
+# Select the feature columns (all except 'class')
+X = data.values[:, 0:8]
+
+# Initialize the Binarizer with a threshold of 100
+binarizer = Binarizer(threshold=100).fit(X)
+
+# Transform the data into binary format
+binaryX = binarizer.transform(X)
+
+# Display the first 5 rows of the binarized data
+print("Binarized Data:\n", binaryX[:5])
+-----------------------------------------------------------
+from sklearn.preprocessing import StandardScaler 
+import pandas as pd 
+import numpy as np 
+url = "https://raw.githubusercontent.com/jbrownlee/Datasets/master/pima-indians-diabetes.csv" 
+names = ['preg', 'plas', 'pres', 'skin', 'test', 'mass', 'pedi', 'age', 'class'] 
+dataframe = pd.read_csv(url, names=names) 
+array = dataframe.values 
+X = array[:, 0:8] 
+scaler = StandardScaler().fit(X) 
+rescaledX = scaler.transform(X) 
+print("Standardized Data:\n", rescaledX[:10])
+----------------------------
+import scipy.stats as stats
+import seaborn as sns
+import pandas as pd
+
+# Load dataset and create contingency table
+dataset = sns.load_dataset('tips')
+contingency_table = pd.crosstab(dataset['sex'], dataset['smoker'])
+
+# Perform Chi-Square Test
+chi2_stat, p_value, dof, expected = stats.chi2_contingency(contingency_table)
+
+# Output results
+print(f"Observed Values:\n{contingency_table.values}")
+print(f"Expected Values:\n{expected}")
+print(f"Chi-Square Statistic: {chi2_stat}")
+print(f"Degree of Freedom: {dof}")
+print(f"p-value: {p_value}")
+
+# Decision based on chi-square statistic and critical value
+alpha = 0.05
+critical_value = stats.chi2.ppf(1 - alpha, dof)
+
+if chi2_stat >= critical_value:
+    print("Reject H0: There is a relationship between the variables")
+else:
+    print("Retain H0: There is no relationship between the variables")
+
+# Decision based on p-value
+if p_value <= alpha:
+    print("Reject H0: There is a relationship between the variables")
+else:
+    print("Retain H0: There is no relationship between the variables")
+----------
