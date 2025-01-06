@@ -1,51 +1,25 @@
-#include <iostream>
-#include <vector>
-
-using namespace std;
-
 class Solution {
 public:
-    vector<int> minOperations(string n) {
-        vector<int> v1;
-
-        for (auto &i : n) {
-            v1.push_back(int(i) - 48);
+    vector<int> minOperations(string b) {
+        map<int,int> mp;
+        for(int i=0;i<b.size();i++){
+            if(b[i]=='1'){
+                mp[i]=i;
+            }
         }
+        vector<int> v1(b.size());
+        for(int i=0;i<b.size();i++){
+            int c=0;
+            for(auto &j:mp){
+                if(j.first!=i){
+                    c+=abs(j.second-i);
 
-        vector<int> v2 = v1;
-        int s = 0;
-
-        for (int i = 0; i < v1.size(); i++) {
-            s = 0;
-            for (int j = i+1; j < v1.size(); j++) {
-                if (v1[j] == 1) {
-                    s += abs(i - j);
                 }
             }
-            v1[i] = s;
+            v1[i]=c;
+
         }
-
-        reverse(v2.begin(), v2.end());
-        int s1 = 0;
-
-        for (int i = 0; i < v2.size(); i++) {
-            s1 = 0;
-            for (int j = i+1; j < v2.size(); j++) {
-                if (v2[j] == 1) {
-                    s1 += abs(i - j);
-                }
-            }
-            v2[i] = s1;
-        }
-
-        reverse(v2.begin(), v2.end());
-
-        vector<int> result;
-
-        for (int i = 0; i < v1.size(); i++) {
-            result.push_back(v1[i] + v2[i]);
-        }
-
-        return result;
+        return v1;
+        
     }
 };
