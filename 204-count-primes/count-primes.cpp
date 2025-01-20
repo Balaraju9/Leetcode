@@ -8,7 +8,7 @@ public:
         v1[1]=false;
         for(int i=2;i<=sqrt(n);i++){
             if(v1[i]==true){
-                for(int j=2*i;j<=n;j=j+i){
+                for(int j=i*i;j<=n;j=j+i){
                     v1[j]=false;
                 }
             }
