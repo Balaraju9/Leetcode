@@ -3,6 +3,9 @@ public:
     string findDifferentBinaryString(vector<string>& n) {
         int si=n.size();
         unordered_map<string,int> mp;
+        for(auto &i:n){
+            mp[i]++;
+        }
         for(int i=0;i<pow(2,si);i++){
             string pu;
             for(int j=0;j<si;j++){
@@ -13,16 +16,12 @@ public:
                     pu+='0';
                 }
             }
-            mp[pu]++;
+            if(!mp[pu]>=1){
+                return pu;
+            }
+            
         }
-       for(auto &i:n){
-        mp[i]--;
-       }
-       for(auto &i:mp){
-        if(i.second>=1){
-            return i.first;
-        }
-       }
+     
         return "22";
         
     }
