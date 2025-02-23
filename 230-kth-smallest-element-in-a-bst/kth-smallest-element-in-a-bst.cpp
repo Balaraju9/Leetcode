@@ -11,24 +11,26 @@
  */
 class Solution {
    
-   vector<int> v1;
+   priority_queue<int> q;
 
 public:
     void fun(TreeNode* root,int k){
         if(root==NULL){
             return;
         }
-        v1.push_back(root->val);
+        q.push(root->val);
+        while(q.size()>k){
+            q.pop();
+
+        }
         fun(root->left,k);
         fun(root->right,k);
-
     }
+  
     int kthSmallest(TreeNode* root, int k) {
 
        fun(root,k);
-        sort(v1.begin(),v1.end());
- 
-       return v1[k-1];
+       return q.top();
         
         
     }
