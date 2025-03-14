@@ -11,9 +11,9 @@ public:
 
     }
     int maximumCandies(vector<int>& c, long long k) {
-        sort(c.begin(),c.end());
+      
         int l=1;
-        int h=c[c.size()-1];
+        int h=*max_element(c.begin(),c.end());
         vector<int> c1=c;
         while(l<=h){
             int m=(l+h)/2;
