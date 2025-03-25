@@ -52,38 +52,37 @@ void fun1(TreeNode *q,vector<int> &v2){
 
 
 
-
-
-# Leetcode
 1
-import csv  
 
-# Define attributes and initialize hypothesis
-attributes = [['Sunny', 'Rainy'], ['Warm', 'Cold'], ['Normal', 'High'], 
-              ['Strong', 'Weak'], ['Warm', 'Cool'], ['Same', 'Change']]  
-num_attributes = len(attributes)  
-hypothesis = ['0'] * num_attributes  
-
-# Read training data  
-data = []  
-with open('/content/enjoysport.csv', 'r') as file:  
-    reader = csv.reader(file)  
-    data = list(reader)  
-
-# Initialize hypothesis with the first positive example  
-for i in range(num_attributes):  
-    hypothesis[i] = data[0][i]  
-
-# Apply Find-S algorithm  
-for row in data:  
-    if row[num_attributes] == 'Yes':  
-        for i in range(num_attributes):  
-            if row[i] != hypothesis[i]:  
-                hypothesis[i] = '?'  
-
-# Print final hypothesis  
-print("Maximally Specific Hypothesis:", hypothesis)  
-
+import random
+import csv
+attributes=[["Sunny","Rainy"],["Warm","Cold"],["Normal","High"],["Strong","Weak"],["Warm","Cool"],["Same","Change"]]
+num_attributes=len(attributes)
+print("The most general hypothesis: ['?','?','?','?','?','?']")
+print("The most general hypothesis: ['0','0','0','0','0','0']")
+a=[]
+print("The given training dataset: ")
+with open('enjoysport.csv','r') as csvFile:
+  reader=csv.reader(csvFile)
+  for row in reader:
+    a.append(row)
+    print(row)
+print("The initial value of hypothesis: ")
+hypothesis=['0']*num_attributes
+print(hypothesis)
+for j in range(0,num_attributes):
+  hypothesis[j]=a[0][j]
+print("FIND-S: Finding a Maximality Specific Hypothesis")
+for i in range(0,len(a)):
+  if a[i][num_attributes]=="yes":
+    for j in range(0,num_attributes):
+      if a[i][j]!=hypothesis[j]:
+        hypothesis[j]='?'
+      else:
+        hypothesis[j]=a[i][j]
+  print("For training example no: {0} the hypothesis is ".format(i),hypothesis)
+print("The Maximally Specific Hypothesis for a given training examples:")
+print(hypothesis)
 
 3
 import pandas as pd
@@ -323,6 +322,47 @@ plt.legend(), plt.show()
 
 
 
+
+
+    10
+
+
+    import numpy as np
+
+# Input and Output Data (Normalized)
+X = np.array([[2, 9], [1, 5], [3, 6]]) / 9
+Y = np.array([[0.92], [0.86], [0.89]])
+
+# Sigmoid Activation Function
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+# Derivative of Sigmoid
+def sigmoid_derivative(x):
+    return x * (1 - x)
+
+# Initialize Weights and Biases
+np.random.seed(1)
+W1 = np.random.rand(2, 3)  # Weights for input to hidden layer
+W2 = np.random.rand(3, 1)  # Weights for hidden to output layer
+
+# Training
+for _ in range(5000):
+    # Forward Propagation
+    hidden = sigmoid(np.dot(X, W1))
+    output = sigmoid(np.dot(hidden, W2))
+
+    # Backpropagation
+    error = Y - output
+    d_output = error * sigmoid_derivative(output)
+    d_hidden = d_output.dot(W2.T) * sigmoid_derivative(hidden)
+
+    # Update Weights
+    W2 += hidden.T.dot(d_output) * 0.1
+    W1 += X.T.dot(d_hidden) * 0.1
+
+# Print Results
+print("Predicted Output:\n", output)
 
 
 
