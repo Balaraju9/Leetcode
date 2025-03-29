@@ -47,13 +47,7 @@ public:
             }
 
         }
-        for(auto &i:v1){
-            cout<<i<<" ";
-        }
-        cout<<endl;
-        for(auto &i:v2){
-            cout<<i<<" ";
-        }
+       
         for(int i=0;i<v1.size()-1;i++){
             if(v1[i]==v2[i+1] && v1[i]!=0){
                 return i;
