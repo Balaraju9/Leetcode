@@ -42,530 +42,583 @@ public:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-inputasoutput
-%{
+---------------------------------------------------------------------------------------------------------------------------------------
 #include <stdio.h>
-%}
+#include <ctype.h>
+shift
+int main() {
+    char text[500];
+    int key;
 
-%%
-.   { printf("%s", yytext); }
-\n  { printf("\n"); }
-%%
+    printf("Enter a message to decrypt: ");
+    fgets(text, sizeof(text), stdin);  // Read full message with spaces
 
-int yywrap(void) {
-    return 1;
-}
+    printf("Enter the key: ");
+    scanf("%d", &key);
 
-int main(void) {
-    yylex();
+    for (int i = 0; text[i] != '\0'; ++i) {
+        char ch = text[i];
+
+        if (islower(ch)) {
+            ch = (ch - 'a' - key + 26) % 26 + 'a';
+        } 
+        else if (isupper(ch)) {
+            ch = (ch - 'A' - key + 26) % 26 + 'A';
+        } 
+        else if (isdigit(ch)) {
+            ch = (ch - '0' - key + 10) % 10 + '0';
+        }
+        text[i] = ch;  // Store modified character
+    }
+
+    printf("Decrypted message: %s", text);
     return 0;
 }
----------------------------------------------------------------------------------------------
-%{
+
+-----------------------------------------------------------------------------------
 #include <stdio.h>
-%}
+#include <string.h>
 
-%%
-[\n\t ' ']  ;    // Ignore spaces, tabs, and newlines
-.           { printf("%s", yytext); }  // Print everything else
-%%
+// Mapping for Mono-Alphabetic Substitution Cipher
+char alpha[26][2] = { 
+    {'a', 'f'}, {'b', 'a'}, {'c', 'g'}, {'d', 'u'}, {'e', 'n'}, {'f', 'i'}, {'g', 'j'}, {'h', 'k'}, {'i', 'l'}, 
+    {'j', 'm'}, {'k', 'o'}, {'l', 'p'}, {'m', 'q'}, {'n', 'r'}, {'o', 's'}, {'p', 't'}, {'q', 'v'}, {'r', 'w'}, 
+    {'s', 'x'}, {'t', 'y'}, {'u', 'z'}, {'v', 'b'}, {'w', 'c'}, {'x', 'd'}, {'y', 'e'}, {'z', 'h'} 
+};
 
-int yywrap() {
-    return 1;
+// Encryption function
+char encrypt_char(char a) {
+    for (int i = 0; i < 26; i++) {
+        if (a == alpha[i][0])
+            return alpha[i][1];
+    }
+    return a;  // Return unchanged if not found
+}
+
+// Decryption function
+char decrypt_char(char a) {
+    for (int i = 0; i < 26; i++) {
+        if (a == alpha[i][1])
+            return alpha[i][0];
+    }
+    return a;
 }
 
 int main() {
-    yyin = fopen("myfile.txt", "r");  // Open the input file
-    if (!yyin) {
-        printf("Error opening file!\n");
-        return 1;
+    char str[100], encrypted[100], decrypted[100];
+
+    printf("Enter a string to encrypt: ");
+    fgets(str, sizeof(str), stdin);
+    str[strcspn(str, "\n")] = '\0';  // Remove newline character
+
+    // Encryption
+    for (int i = 0; str[i]; i++) {
+        encrypted[i] = encrypt_char(str[i]);
     }
-    yylex();  // Run lexer
-    fclose(yyin);  // Close file
+    encrypted[strlen(str)] = '\0';
+
+    // Decryption
+    for (int i = 0; encrypted[i]; i++) {
+        decrypted[i] = decrypt_char(encrypted[i]);
+    }
+    decrypted[strlen(encrypted)] = '\0';
+
+    printf("Original Text  : %s\n", str);
+    printf("Encrypted Text : %s\n", encrypted);
+    printf("Decrypted Text : %s\n", decrypted);
+
     return 0;
 }
----------------------------------------------------------------------------------------------
-    pattern
-%{
+------------------------------------------------------------------------------------
+
+
 #include <stdio.h>
-%}
-
-%%
-"int"|"char"|"for"|"if"|"while"|"then"|"return"|"do"   { printf("Keyword: %s\n", yytext); }
-[\+\-\*/%]                                            { printf("Operator: %s\n", yytext); }
-[(){};]                                               { printf("Special Character: %s\n", yytext); }
-[0-9]+                                                { printf("Constant: %s\n", yytext); }
-[a-zA-Z_][a-zA-Z0-9_]*                                { printf("Valid Identifier: %s\n", yytext); }
-[^a-zA-Z0-9_]+                                        { printf("Invalid Identifier: %s\n", yytext); }
-%%
-
-int yywrap() {
-    return 1;
-}
-
-int main() {
-    yyin = fopen("input.txt", "r");  // Open input file
-    if (!yyin) {
-        printf("Error opening file!\n");
-        return 1;
-    }
-    yylex();  // Run lexical analyzer
-    fclose(yyin);  // Close file
-    return 0;
-}
----------------------------------------------------------------------------------------------
-%{
-#include <stdio.h>
-int i = 0, id = 0;
-%}
-
-%%
-[#].*[<].*[>]\n     {}  // Ignore preprocessor directives like #include<stdio.h>
-[ \t\n]+            {}  // Ignore spaces, tabs, and newlines
-\/\/.*\n            {}  // Ignore single-line comments (// ...)
-\/\*(.|\n)*?\*\/    {}  // Ignore multi-line comments (/* ... */)
-
-auto|break|case|char|const|continue|default|do|double|else|enum|extern|float|for|
-goto|if|int|long|register|return|short|signed|sizeof|static|struct|switch|
-typedef|union|unsigned|void|volatile|while  
-{ printf("Token: %d <keyword, %s>\n", ++i, yytext); }
-
-[+\-\*\/%<>]        { printf("Token: %d <operator, %s>\n", ++i, yytext); }
-[();{}]             { printf("Token: %d <special char, %s>\n", ++i, yytext); }
-[0-9]+              { printf("Token: %d <constant, %s>\n", ++i, yytext); }
-[a-zA-Z_][a-zA-Z0-9_]*  
-{ printf("Token: %d <ID %d, %s>\n", ++i, ++id, yytext); }
-
-[^a-zA-Z0-9_]+      { printf("ERROR: INVALID TOKEN %s\n", yytext); }
-%%
-
-int yywrap() {
-    return 1;
-}
-
-int main() {
-    yyin = fopen("input.txt", "r");  // Open input file
-    if (!yyin) {
-        printf("Error opening file!\n");
-        return 1;
-    }
-    yylex();  // Run lexical analyzer
-    fclose(yyin);  // Close file
-    return 0;
-}
-
----------------------------------------------------------------------------------------------
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 
-int n, m = 0;
-char a[10][10], f[10];
+int main() {
+    char plaintext[100], key[100], ciphertext[100], decrypted[100];
+    int i, len;
 
-void first(char c);
-void follow(char c);
+    printf("Enter plaintext (UPPERCASE, no spaces): ");
+    scanf("%s", plaintext);
+    printf("Enter key (SAME length as plaintext): ");
+    scanf("%s", key);
 
-void follow(char c) {
-    if (a[0][0] == c)
-        f[m++] = '$'; // Add end marker if it's the start symbol
+    len = strlen(plaintext);
 
-    for (int i = 0; i < n; i++) {
-        for (int j = 2; j < strlen(a[i]); j++) {
-            if (a[i][j] == c) {
-                if (a[i][j + 1] != '\0')
-                    first(a[i][j + 1]);
-                else if (c != a[i][0])
-                    follow(a[i][0]);
+    // Encryption
+    for (i = 0; i < len; i++) {
+        ciphertext[i] = ((plaintext[i] - 'A' + key[i] - 'A') % 26) + 'A';
+    }
+    ciphertext[len] = '\0';
+
+    printf("Encrypted Text: %s\n", ciphertext);
+
+    // Decryption
+    for (i = 0; i < len; i++) {
+        decrypted[i] = ((ciphertext[i] - 'A' - (key[i] - 'A') + 26) % 26) + 'A';
+    }
+    decrypted[len] = '\0';
+
+    printf("Decrypted Text: %s\n", decrypted);
+
+    return 0;
+}
+----------------------------------------------------------------------------
+#include <stdio.h>
+#include <string.h>
+
+void vernamCipher(char *input, char *key, char *output) {
+    for (int i = 0; input[i] != '\0'; i++) {
+        output[i] = input[i] ^ key[i];  // XOR operation
+    }
+    output[strlen(input)] = '\0';  // Null terminate
+}
+
+int main() {
+    char plaintext[100], key[100], ciphertext[100], decrypted[100];
+
+    printf("Enter Plaintext: ");
+    scanf("%s", plaintext);
+    
+    printf("Enter Key (same length as plaintext): ");
+    scanf("%s", key);
+
+    if (strlen(plaintext) != strlen(key)) {
+        printf("Error: Key length must match plaintext length.\n");
+        return 1;
+    }
+
+    // Encrypt
+    vernamCipher(plaintext, key, ciphertext);
+    printf("Ciphertext: ");
+    for (int i = 0; i < strlen(ciphertext); i++) {
+        printf("%02X ", (unsigned char)ciphertext[i]);  // Print as hex
+    }
+    printf("\n");
+
+    // Decrypt
+    vernamCipher(ciphertext, key, decrypted);
+    printf("Decrypted Text: %s\n", decrypted);
+
+    return 0;
+}
+
+---------------------------------------------------------------------------------------
+#include <stdio.h>
+#include <math.h>
+RSA Algorithm in C
+// Function to compute GCD
+int gcd(int a, int b) {
+    while (b != 0) {
+        int temp = b;
+        b = a % b;
+        a = temp;
+    }
+    return a;
+}
+
+// Function t	o compute (base^exp) % mod
+long long power_mod(long long base, long long exp, long long mod) {
+    long long result = 1;
+    while (exp > 0) {
+        if (exp % 2 == 1) {  // If exp is odd, multiply base
+            result = (result * base) % mod;
+        }
+        base = (base * base) % mod;
+        exp /= 2;
+    }
+    return result;
+}
+
+int main() {
+    // Choose two prime numbers
+    int p = 3, q = 7;
+    int n = p * q;  // Compute n
+    int totient = (p - 1) * (q - 1);  // Compute totient
+
+    // Choose public key exponent e (must be coprime with totient)
+    int e = 2;
+    while (gcd(e, totient) != 1) {
+        e++;
+    }
+
+    // Compute private key d (modular inverse of e)
+    int d = 1;
+    while ((d * e) % totient != 1) {
+        d++;
+    }
+
+    // Message to encrypt
+    int msg = 12;
+    
+    // Encryption: c = (msg^e) % n
+    int c = power_mod(msg, e, n);
+
+    // Decryption: m = (c^d) % n
+    int m = power_mod(c, d, n);
+
+    // Print results
+    printf("Message: %d\n", msg);
+    printf("p = %d, q = %d\n", p, q);
+    printf("n = %d\n", n);
+    printf("Totient = %d\n", totient);
+    printf("Public Key (e) = %d\n", e);
+    printf("Private Key (d) = %d\n", d);
+    printf("Encrypted Data (Ciphertext) = %d\n", c);
+    printf("Decrypted Message = %d\n", m);
+
+    return 0;
+}
+-------------------------------------------------------------------------------------
+ Diffie-Hellman Key Exchange in C
+#include <stdio.h>
+
+// Function to compute (base^exp) % mod efficiently
+long long power_mod(long long base, long long exp, long long mod) {
+    long long result = 1;
+    while (exp > 0) {
+        if (exp % 2 == 1) {  // If exp is odd, multiply base
+            result = (result * base) % mod;
+        }
+        base = (base * base) % mod;
+        exp /= 2;
+    }
+    return result;
+}
+
+int main() {
+    long long P = 23, G = 9; // Public keys (Prime number & Primitive root)
+    long long a = 4, b = 3;  // Private keys chosen by Alice & Bob
+
+    printf("Public keys: P = %lld, G = %lld\n", P, G);
+    printf("Alice's private key: %lld\n", a);
+    printf("Bob's private key: %lld\n\n", b);
+
+    // Compute public keys to exchange
+    long long A = power_mod(G, a, P); // Alice's public key
+    long long B = power_mod(G, b, P); // Bob's public key
+
+    printf("Alice's public key (A) = %lld\n", A);
+    printf("Bob's public key (B) = %lld\n\n", B);
+
+    // Compute shared secret key
+    long long secret_Alice = power_mod(B, a, P); // Secret key for Alice
+    long long secret_Bob = power_mod(A, b, P);   // Secret key for Bob
+
+    printf("Secret key for Alice: %lld\n", secret_Alice);
+    printf("Secret key for Bob: %lld\n", secret_Bob);
+
+    return 0;
+}
+
+
+--------------------------------------------------
+Simple ElGamal Cryptosystem in C
+#include <stdio.h>
+
+// Function to compute (base^exp) % mod efficiently
+long long power_mod(long long base, long long exp, long long mod) {
+    long long result = 1;
+    while (exp > 0) {
+        if (exp % 2 == 1) {  // If exp is odd, multiply base
+            result = (result * base) % mod;
+        }
+        base = (base * base) % mod;
+        exp /= 2;
+    }
+    return result;
+}
+
+int main() {
+    long long p = 23, g = 5; // Public prime and generator
+    long long x = 6;  // Private key (chosen by receiver)
+    
+    // Compute public key
+    long long y = power_mod(g, x, p);
+    
+    printf("Public key: (p = %lld, g = %lld, y = %lld)\n", p, g, y);
+    printf("Private key (x): %lld\n\n", x);
+    
+    // Encryption
+    long long msg = 10; // Original message
+    long long k = 3;  // Random secret integer
+    long long c1 = power_mod(g, k, p);
+    long long c2 = (msg * power_mod(y, k, p)) % p;
+    
+    printf("Original Message: %lld\n", msg);
+    printf("Encrypted values: (c1 = %lld, c2 = %lld)\n\n", c1, c2);
+    
+    // Decryption
+    long long key = power_mod(c1, x, p);
+    long long decrypted_msg = (c2 * power_mod(key, p - 2, p)) % p; // Modular inverse
+    
+    printf("Decrypted Message: %lld\n", decrypted_msg);
+
+    return 0;
+}
+
+
+-------------------------------------------
+------------------------------------------
+sentence reversal
+import java.io.*;  
+import java.net.*;  
+
+public class ReverseServer {  
+    public static void main(String[] args) throws IOException {  
+        ServerSocket server = new ServerSocket(1234);  
+        System.out.println("Server running... Waiting for clients.");  
+
+        while (true) {  
+            Socket client = server.accept();  
+            BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));  
+            PrintWriter out = new PrintWriter(client.getOutputStream(), true);  
+
+            String input = in.readLine();  
+            System.out.println("Client: " + input);  
+
+            String reversed = new StringBuilder(input).reverse().toString();  
+            out.println(reversed);  
+
+            client.close();  
+        }  
+    }  
+}
+
+import java.io.*;  
+import java.net.*;  
+
+public class ReverseClient {  
+    public static void main(String[] args) throws IOException {  
+        Socket socket = new Socket("localhost", 1234);  
+        BufferedReader userIn = new BufferedReader(new InputStreamReader(System.in));  
+        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);  
+        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));  
+
+        System.out.print("Enter sentence: ");  
+        String sentence = userIn.readLine();  
+        out.println(sentence);  
+
+        System.out.println("Reversed: " + in.readLine());  
+        socket.close();  
+    }  
+}
+----------------------------------------------------------------
+
+transfer file
+import java.io.*;  
+import java.net.*;  
+
+public class FileServer {  
+    public static void main(String[] args) throws IOException {  
+        ServerSocket server = new ServerSocket(5000);  
+        System.out.println("Waiting for connection...");  
+
+        Socket client = server.accept();  
+        System.out.println("Client connected.");  
+
+        // Create a sample file dynamically
+        String fileName = "sample.txt";
+        FileWriter writer = new FileWriter(fileName);
+        writer.write("This is a test file sent from server.");
+        writer.close();
+
+        // Send the file
+        FileInputStream fileIn = new FileInputStream(fileName);  
+        OutputStream out = client.getOutputStream();  
+        byte[] buffer = new byte[4096];  
+        int bytesRead;  
+        while ((bytesRead = fileIn.read(buffer)) != -1) {  
+            out.write(buffer, 0, bytesRead);  
+        }  
+
+        System.out.println("File sent.");  
+        fileIn.close();  
+        client.close();  
+        server.close();  
+    }  
+}
+
+
+import java.io.*;  
+import java.net.*;  
+
+public class FileClient {  
+    public static void main(String[] args) throws IOException {  
+        Socket socket = new Socket("127.0.0.1", 5000);  
+        InputStream in = socket.getInputStream();  
+        FileOutputStream fileOut = new FileOutputStream("received.txt");  
+
+        byte[] buffer = new byte[4096];  
+        int bytesRead;  
+        while ((bytesRead = in.read(buffer)) != -1) {  
+            fileOut.write(buffer, 0, bytesRead);  
+        }  
+
+        System.out.println("File received.");  
+        fileOut.close();  
+        socket.close();  
+    }  
+}
+
+
+--------------------------------------------------------------
+select
+import java.io.*;
+import java.net.*;
+import java.nio.*;
+import java.nio.channels.*;
+import java.util.*;
+
+public class TCPConcurrentServerUpper {
+    public static void main(String[] args) throws IOException {
+        Selector selector = Selector.open();
+        ServerSocketChannel server = ServerSocketChannel.open();
+        server.bind(new InetSocketAddress(5000));
+        server.configureBlocking(false);
+        server.register(selector, SelectionKey.OP_ACCEPT);
+        System.out.println("Server running...");
+
+        while (true) {
+            selector.select();
+            Iterator<SelectionKey> keys = selector.selectedKeys().iterator();
+            while (keys.hasNext()) {
+                SelectionKey key = keys.next();
+                keys.remove();
+
+                if (key.isAcceptable()) {
+                    SocketChannel client = server.accept();
+                    client.configureBlocking(false);
+                    client.register(selector, SelectionKey.OP_READ);
+                } 
+                else if (key.isReadable()) {
+                    SocketChannel client = (SocketChannel) key.channel();
+                    ByteBuffer buffer = ByteBuffer.allocate(1024);
+                    if (client.read(buffer) == -1) { client.close(); continue; }
+                    buffer.flip();
+                    String msg = new String(buffer.array(), 0, buffer.limit()).toUpperCase();
+                    client.write(ByteBuffer.wrap(msg.getBytes()));
+                }
             }
         }
     }
 }
 
-void first(char c) {
-    if (!isupper(c)) {
-        f[m++] = c;
-        return;
-    }
-    
-    for (int k = 0; k < n; k++) {
-        if (a[k][0] == c) {
-            if (a[k][2] == '$')
-                follow(a[k][0]);
-            else if (islower(a[k][2]))
-                f[m++] = a[k][2];
-            else
-                first(a[k][2]);
+
+import java.io.*;
+import java.net.*;
+import java.nio.*;
+import java.nio.channels.*;
+import java.util.Scanner;
+
+public class TCPClientUpper {
+    public static void main(String[] args) throws IOException {
+        SocketChannel client = SocketChannel.open(new InetSocketAddress("localhost", 5000));
+        ByteBuffer buffer = ByteBuffer.allocate(1024);
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.print("Enter text (or 'exit' to quit): ");
+            String msg = scanner.nextLine();
+            if (msg.equalsIgnoreCase("exit")) break;
+
+            buffer.clear();
+            buffer.put(msg.getBytes());
+            buffer.flip();
+            client.write(buffer);
+
+            buffer.clear();
+            client.read(buffer);
+            buffer.flip();
+            System.out.println("Server: " + new String(buffer.array(), 0, buffer.limit()));
         }
-    }
-}
-
-int main() {
-    int z;
-    char c, ch;
-    
-    printf("Enter the number of productions: ");
-    scanf("%d", &n);
-    printf("Enter the productions (use $ for epsilon):\n");
-    
-    for (int i = 0; i < n; i++)
-        scanf("%s%c", a[i], &ch);
-
-    do {
-        m = 0;
-        printf("Enter the element whose FIRST & FOLLOW is to be found: ");
-        scanf(" %c", &c);  // Space before %c to ignore previous newline
         
-        first(c);
-        printf("FIRST(%c) = { ", c);
-        for (int i = 0; i < m; i++)
-            printf("%c ", f[i]);
-        printf("}\n");
+        client.close();
+        scanner.close();
+    }
+}
+
+----------------------------------------------------------------------------------------
+poll
+import java.io.*;
+import java.net.*;
+import java.nio.*;
+import java.nio.channels.*;
+import java.util.*;
+
+public class TCPConcurrentPollServer {
+    public static void main(String[] args) throws IOException {
+        ServerSocketChannel server = ServerSocketChannel.open();
+        server.bind(new InetSocketAddress(12345));
+        server.configureBlocking(false);
         
-        m = 0;
-        follow(c);
-        printf("FOLLOW(%c) = { ", c);
-        for (int i = 0; i < m; i++)
-            printf("%c ", f[i]);
-        printf("}\n");
-        
-        printf("Do you want to continue? (1 for Yes, 0 for No): ");
-        scanf("%d%c", &z, &ch);
-    } while (z == 1);
+        Selector selector = Selector.open();
+        server.register(selector, SelectionKey.OP_ACCEPT);
+        System.out.println("Server running...");
 
-    return 0;
-}
--------------------------------------------------------------------------------------
-%{
-#include <stdio.h>
-int i = 0, id = 0;
-%}
+        while (true) {
+            selector.select();
+            Iterator<SelectionKey> keys = selector.selectedKeys().iterator();
+            while (keys.hasNext()) {
+                SelectionKey key = keys.next();
+                keys.remove();
 
-%%
-[#].*[<].*[>]\n     {}  // Ignore preprocessor directives (e.g., #include <stdio.h>)
-[\t\n]+            {}  // Ignore spaces, tabs, and newlines
-\/\/.*\n           {}  // Ignore single-line comments (// ...)
-\/\*(.|\n)*?\*\/   {}  // Ignore multi-line comments (/* ... */)
-
-auto|break|case|char|const|continue|default|do|double|else|enum|extern|float|
-for|goto|if|int|long|register|return|short|signed|sizeof|static|struct|switch|
-typedef|union|unsigned|void|volatile|while  
-{ printf("Token: %d <keyword, %s>\n", ++i, yytext); }
-
-[+\-\*\/%<>]        { printf("Token: %d <operator, %s>\n", ++i, yytext); }
-[();{}]             { printf("Token: %d <special char, %s>\n", ++i, yytext); }
-[0-9]+              { printf("Token: %d <constant, %s>\n", ++i, yytext); }
-[a-zA-Z_][a-zA-Z0-9_]*  
-{ printf("Token: %d <ID %d, %s>\n", ++i, ++id, yytext); }
-
-[^a-zA-Z0-9_]+      { printf("ERROR: INVALID TOKEN %s\n", yytext); }
-%%
-
-int yywrap() {
-    return 1;
-}
-
-int main() {
-    yyin = fopen("input.txt", "r");  // Open input file
-    if (!yyin) {
-        printf("Error opening file!\n");
-        return 1;
-    }
-    yylex();  // Run lexical analyzer
-    fclose(yyin);  // Close file
-    return 0;
-}
--------------------------------------------------------------------------------------
-Recursive Descent Parser
-#include <stdio.h>
-#include <ctype.h>
-#include <string.h>
-
-void E();   // Expression
-void Ep();  // Expression Prime (Handles +)
-void T();   // Term
-void Tp();  // Term Prime (Handles *)
-void check();
-
-int count = 0, flag = 0;
-char expr[100];
-
-int main() {
-    printf("\nEnter an Algebraic Expression: ");
-    scanf("%s", expr);
-    
-    E();  // Start parsing from the Expression
-
-    if ((strlen(expr) == count) && (flag == 0))
-        printf("\nThe expression %s is valid\n", expr);
-    else
-        printf("\nThe expression %s is invalid\n", expr);
-
-    return 0;
-}
-
-// E → T Ep
-void E() {
-    T();
-    Ep();
-}
-
-// Ep → + T Ep | ε
-void Ep() {
-    if (expr[count] == '+') {
-        count++;
-        T();
-        Ep();
-    }
-}
-
-// T → check Tp
-void T() {
-    check();
-    Tp();
-}
-
-// Tp → * check Tp | ε
-void Tp() {
-    if (expr[count] == '*') {
-        count++;
-        check();
-        Tp();
-    }
-}
-
-// check → id | (E)
-void check() {
-    if (isalnum(expr[count])) {  // If alphanumeric (identifier or number)
-        count++;
-    } 
-    else if (expr[count] == '(') {  // If opening bracket, process sub-expression
-        count++;
-        E();
-        if (expr[count] == ')')
-            count++;
-        else
-            flag = 1;  // Unmatched parentheses error
-    } 
-    else {
-        flag = 1;  // Invalid token
-    }
-}
-
-
-
-
-
-
- Loop Unrolling
-
-#include <stdio.h>
-
-#define TOGETHER 8  // Number of iterations unrolled together
-
-int main(void) {
-    int i = 0, entries = 15, repeat, left;
-
-    repeat = entries / TOGETHER;  // Calculate full unrolled iterations
-    left = entries % TOGETHER;    // Remaining iterations
-
-    // Unrolled loop processing 8 iterations at a time
-    while (repeat--) {
-        printf("process(%d)\n", i);
-        printf("process(%d)\n", i+1);
-        printf("process(%d)\n", i+2);
-        printf("process(%d)\n", i+3);
-        printf("process(%d)\n", i+4);
-        printf("process(%d)\n", i+5);
-        printf("process(%d)\n", i+6);
-        printf("process(%d)\n", i+7);
-        i += TOGETHER;
-    }
-
-    // Process remaining iterations
-    switch (left) {
-        case 7: printf("process(%d)\n", i+6);
-        case 6: printf("process(%d)\n", i+5);
-        case 5: printf("process(%d)\n", i+4);
-        case 4: printf("process(%d)\n", i+3);
-        case 3: printf("process(%d)\n", i+2);
-        case 2: printf("process(%d)\n", i+1);
-        case 1: printf("process(%d)\n", i);
-        case 0: break;
-    }
-
-    return 0;
-}
-
-
-
-
-
-
-Constant Propagation in C
-
-
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <ctype.h>
-
-void input();
-void output();
-void change(int p, char *res);
-void constant_propagation();
-
-struct expr {
-    char op[2], op1[5], op2[5], res[5];
-    int flag;
-} arr[10];
-
-int n;
-
-int main() {
-    input();
-    constant_propagation();
-    output();
-    return 0;
-}
-
-void input() {
-    int i;
-    printf("\nEnter the number of expressions: ");
-    scanf("%d", &n);
-    printf("\nEnter the expressions (operator operand1 operand2 result):\n");
-    for (i = 0; i < n; i++) {
-        scanf("%s %s %s %s", arr[i].op, arr[i].op1, arr[i].op2, arr[i].res);
-        arr[i].flag = 0;  // Mark as not optimized yet
-    }
-}
-
-void constant_propagation() {
-    int i, op1, op2, res;
-    char res1[5];
-
-    for (i = 0; i < n; i++) {
-        if ((isdigit(arr[i].op1[0]) && isdigit(arr[i].op2[0])) || strcmp(arr[i].op, "=") == 0) {
-            op1 = atoi(arr[i].op1);
-            op2 = atoi(arr[i].op2);
-
-            switch (arr[i].op[0]) {
-                case '+': res = op1 + op2; break;
-                case '-': res = op1 - op2; break;
-                case '*': res = op1 * op2; break;
-                case '/': res = op1 / op2; break;
-                case '=': res = op1; break;
-                default: continue;
+                if (key.isAcceptable()) {
+                    SocketChannel client = server.accept();
+                    client.configureBlocking(false);
+                    client.register(selector, SelectionKey.OP_READ);
+                    System.out.println("Client connected: " + client.getRemoteAddress());
+                } 
+                else if (key.isReadable()) {
+                    SocketChannel client = (SocketChannel) key.channel();
+                    ByteBuffer buffer = ByteBuffer.allocate(1024);
+                    int bytesRead = client.read(buffer);
+                    if (bytesRead == -1) {
+                        client.close();
+                        System.out.println("Client disconnected");
+                    } else {
+                        buffer.flip();
+                        client.write(buffer); // Echoing back
+                        buffer.clear();
+                    }
+                }
             }
-
-            sprintf(res1, "%d", res);
-            arr[i].flag = 1;  // Mark as optimized
-            change(i, res1);
         }
     }
 }
 
-void output() {
-    int i;
-    printf("\nOptimized Code:\n");
-    for (i = 0; i < n; i++) {
-        if (!arr[i].flag) {
-            printf("%s %s %s %s\n", arr[i].op, arr[i].op1, arr[i].op2, arr[i].res);
+
+import java.io.*;
+import java.net.*;
+import java.nio.*;
+import java.nio.channels.*;
+import java.util.Scanner;
+
+public class TCPClientPoll {
+    public static void main(String[] args) throws IOException {
+        SocketChannel client = SocketChannel.open(new InetSocketAddress("localhost", 12345));
+        ByteBuffer buffer = ByteBuffer.allocate(1024);
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.print("Enter message (or 'exit' to quit): ");
+            String msg = scanner.nextLine();
+            if (msg.equalsIgnoreCase("exit")) break;
+
+            buffer.clear();
+            buffer.put(msg.getBytes());
+            buffer.flip();
+            client.write(buffer);
+
+            buffer.clear();
+            client.read(buffer);
+            buffer.flip();
+            System.out.println("Echo from server: " + new String(buffer.array(), 0, buffer.limit()));
         }
+        
+        client.close();
+        scanner.close();
     }
 }
-
-void change(int p, char *res) {
-    int i;
-    for (i = p + 1; i < n; i++) {
-        if (strcmp(arr[p].res, arr[i].op1) == 0)
-            strcpy(arr[i].op1, res);
-        if (strcmp(arr[p].res, arr[i].op2) == 0)
-            strcpy(arr[i].op2, res);
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
---------------------------------------------------------------------------------------------
-operator precedence
-#include<stdio.h>
-#include<string.h>
-char stack[20],temp;
-int top=-1;
-void push(char item){
-  	if(top>=20){
-    	printf("STACK OVERFLOW");
-    	return;
-	}
-  	stack[++top]=item;
-}
-char pop(){
-  	if(top<=-1){
-    	printf("STACK UNDERFLOW");
-    	return;
-  	}
-  	char c;
-  	c=stack[top--];
-  	printf("Popped element:%c\n",c);
-  	return c;
-}
-char TOS(){
-  return stack[top];
-}
-int convert(char item){
-  	switch(item){
-    	case 'i':return 0;
-    	case '+':return 1;
-    	case '*':return 2;
-    	case '$':return 3;
-  	}
-}
-int main(){
-  	char pt[4][4]={
-        {'-','>','>','>'},
-        {'<','>','<','>'},
-        {'<','>','>','>'},
-        {'<','<','<','1'}};
-  	char input[20];
-  	int lkh=0;
-  	printf("Enter input with $ at the end\n");
-  	scanf("%s",input);
-  	push('$');
-  	while(lkh<=strlen(input)){
-    	if(TOS()=='$'&&input[lkh]=='$'){
-      		printf("SUCCESS\n");
-      		return 1;
-    	}
-    	else if(pt[convert(TOS())][convert(input[lkh])]=='<'){
-      		push(input[lkh]);
-      		printf("Push---%c\n",input[lkh]);
-    	  	lkh++;
-    	}
-    	else	pop();
-  	}
-  	return 0;
-}
-            
