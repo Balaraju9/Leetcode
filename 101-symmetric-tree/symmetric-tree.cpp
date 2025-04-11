@@ -791,5 +791,30 @@ public class FileUDPClient {
         client.close();
     }
 }
+-----------------------------------------------------------------------------
+    add and sub
+import java.rmi.registry.*;
+
+public class CalculatorServer {
+    public static void main(String[] args) {
+        try {
+            CalculatorImpl calc = new CalculatorImpl();
+            LocateRegistry.createRegistry(1099).rebind("CalculatorService", calc);
+            System.out.println("Server is running...");
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+}
+
+import java.rmi.registry.*;
+
+public class CalculatorClient {
+    public static void main(String[] args) {
+        try {
+            Calculator calc = (Calculator) LocateRegistry.getRegistry(1099).lookup("CalculatorService");
+            System.out.println("Addition: " + calc.add(10, 5));
+            System.out.println("Subtraction: " + calc.subtract(10, 5));
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+}
 
 
