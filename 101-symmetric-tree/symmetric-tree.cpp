@@ -34,787 +34,457 @@ public:
 };
 
 
+-----------------------------------------------------------------------------------------------------------------------------
+welcome user
+import { NgModule, Component } from '@angular/core';  
+import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';  
+
+@Component({  
+  selector: 'app-root',  
+  standalone: true,  
+  imports: [BrowserModule],  
+  template: `
+    <div *ngIf="!user && !msg">
+      <input #u placeholder="Username">
+      <input #p type="password" placeholder="Password">
+      <button (click)="login(u.value, p.value)">Login</button>
+    </div>
+    <h4 *ngIf="user">{{ msg }}</h4>
+    <h4 *ngIf="msg && !user">{{ msg }}</h4>
+    <button *ngIf="msg" (click)="msg=''; user=''">Back</button>
+  `  
+})  
+class AppComponent {  
+  user = ''; msg = '';  
+  login(name: string, pass: string) {  
+    this.user = name === 'admin' && pass === 'admin' ? name : '';  
+    this.msg = this.user ? `Welcome ${this.user}` : 'Invalid Login!';  
+  }  
+}  
+
+bootstrapApplication(AppComponent);
+
+
+list format
+import { NgModule, Component } from '@angular/core';  
+import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';  
+
+@Component({  
+  selector: 'app-root',  
+  standalone: true,  
+  imports: [BrowserModule],  
+  template: `<ul><li *ngFor="let c of courses; let i=index">{{i}} - {{c.name}}</li></ul>`  
+})  
+class AppComponent {  
+  courses = [ {name: "TypeScript"}, {name: "Angular"}, {name: "Node.js"}, {name: "MongoDB"} ];  
+}  
+
+bootstrapApplication(AppComponent);
 
 
 
 
+choice
+import { Component } from '@angular/core';  
+import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';  
+
+@Component({  
+  selector: 'app-root',  
+  standalone: true,  
+  imports: [BrowserModule],  
+  template: `
+    <h4>Current choice is {{choice}}</h4>
+    <div [ngSwitch]="choice">
+      <p *ngSwitchCase="1">First Choice</p>
+      <p *ngSwitchCase="2">Second Choice</p>
+      <p *ngSwitchCase="3">Third Choice</p>
+      <p *ngSwitchDefault>Default Choice</p>
+    </div>
+    <button (click)="choice = (choice % 3) + 1">Next Choice</button>
+  `  
+})  
+class AppComponent { choice = 0; }  
+
+bootstrapApplication(AppComponent);
 
 
 
+repeat
+import { Component, Directive, Input, TemplateRef, ViewContainerRef } from '@angular/core';  
+import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';  
 
----------------------------------------------------------------------------------------------------------------------------------------
-#include <stdio.h>
-#include <ctype.h>
-shift
-int main() {
-    char text[500];
-    int key;
+@Directive({ selector: '[appRepeat]' })  
+class RepeatDirective {  
+  constructor(private tpl: TemplateRef<any>, private vcr: ViewContainerRef) {}  
+  @Input() set appRepeat(count: number) {  
+    this.vcr.clear();  
+    for (let i = 0; i < count; i++) this.vcr.createEmbeddedView(this.tpl);  
+  }  
+}  
 
-    printf("Enter a message to decrypt: ");
-    fgets(text, sizeof(text), stdin);  // Read full message with spaces
+@Component({  
+  selector: 'app-root',  
+  standalone: true,  
+  imports: [BrowserModule, RepeatDirective],  
+  template: `<h1 *appRepeat="10">Angular</h1>`  
+})  
+class AppComponent {}  
 
-    printf("Enter the key: ");
-    scanf("%d", &key);
+bootstrapApplication(AppComponent);
 
-    for (int i = 0; text[i] != '\0'; ++i) {
-        char ch = text[i];
 
-        if (islower(ch)) {
-            ch = (ch - 'a' - key + 26) % 26 + 'a';
-        } 
-        else if (isupper(ch)) {
-            ch = (ch - 'A' - key + 26) % 26 + 'A';
-        } 
-        else if (isdigit(ch)) {
-            ch = (ch - '0' - key + 10) % 10 + '0';
+
+-------------------------------------------------------------------------------------------
+    7
+registration form
+import { Component } from '@angular/core';
+import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [BrowserModule, FormsModule],
+  template: `
+    <h2>Course Registration Form</h2>
+    <form #courseForm="ngForm" (ngSubmit)="submitForm(courseForm.value)">
+      <label>Name:</label>
+      <input type="text" name="name" ngModel required><br><br>
+
+      <label>Email:</label>
+      <input type="email" name="email" ngModel required><br><br>
+
+      <label>Course:</label>
+      <select name="course" ngModel required>
+        <option value="Angular">Angular</option>
+        <option value="React">React</option>
+        <option value="Vue">Vue</option>
+      </select><br><br>
+
+      <button type="submit">Register</button>
+    </form>
+
+    <div *ngIf="submitted">
+      <h3>Registration Successful!</h3>
+      <p><b>Name:</b> {{ formData.name }}</p>
+      <p><b>Email:</b> {{ formData.email }}</p>
+      <p><b>Course:</b> {{ formData.course }}</p>
+    </div>
+  `
+})
+class AppComponent {
+  submitted = false;
+  formData = { name: '', email: '', course: '' };
+
+  submitForm(data: any) {
+    this.formData = data;
+    this.submitted = true;
+  }
+}
+
+bootstrapApplication(AppComponent);
+-----------------------------------------------
+    7 reative form
+import { Component } from '@angular/core';
+import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
+import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [BrowserModule, ReactiveFormsModule],
+  template: `
+    <h2>Employee Registration</h2>
+    <form [formGroup]="empForm" (ngSubmit)="submitForm()">
+      <label>Name:</label>
+      <input type="text" formControlName="name"><br><br>
+
+      <label>Email:</label>
+      <input type="email" formControlName="email"><br><br>
+
+      <label>Department:</label>
+      <select formControlName="department">
+        <option value="HR">HR</option>
+        <option value="IT">IT</option>
+        <option value="Finance">Finance</option>
+      </select><br><br>
+
+      <button type="submit" [disabled]="empForm.invalid">Register</button>
+    </form>
+
+    <div *ngIf="submitted">
+      <h3>Registration Successful!</h3>
+      <p><b>Name:</b> {{ empForm.value.name }}</p>
+      <p><b>Email:</b> {{ empForm.value.email }}</p>
+      <p><b>Department:</b> {{ empForm.value.department }}</p>
+    </div>
+  `
+})
+class AppComponent {
+  empForm = new FormGroup({
+    name: new FormControl('', Validators.required),
+    email: new FormControl('', [Validators.required, Validators.email]),
+    department: new FormControl('HR', Validators.required)
+  });
+
+  submitted = false;
+
+  submitForm() {
+    this.submitted = true;
+  }
+}
+
+bootstrapApplication(AppComponent);
+
+---------------------------------------------------
+    email validator for 7c  employee registration and 8 is same course registration form
+import { Component } from '@angular/core';
+import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
+import { ReactiveFormsModule, FormGroup, FormControl, Validators, AbstractControl } from '@angular/forms';
+
+// Custom Validator Function
+function emailValidator(control: AbstractControl) {
+  const emailPattern = /^[a-zA-Z0-9._%+-]+@example\.com$/; // Only allows emails ending with @example.com
+  return emailPattern.test(control.value) ? null : { invalidEmail: true };
+}
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [BrowserModule, ReactiveFormsModule],
+  template: `
+    <h2>Employee Registration</h2>
+
+    <form [formGroup]="empForm" (ngSubmit)="submitted=true">
+      <label>Name:</label>
+      <input type="text" formControlName="name">
+      <span *ngIf="empForm.controls.name.invalid && empForm.controls.name.touched" style="color:red">
+        * Required
+      </span>
+      <br><br>
+
+      <label>Email:</label>
+      <input type="email" formControlName="email">
+      <span *ngIf="empForm.controls.email.errors?.invalidEmail && empForm.controls.email.touched" style="color:red">
+        * Must be a valid example.com email
+      </span>
+      <br><br>
+
+      <label>Department:</label>
+      <select formControlName="department">
+        <option value="HR">HR</option>
+        <option value="IT">IT</option>
+        <option value="Finance">Finance</option>
+      </select>
+      <br><br>
+
+      <button type="submit" [disabled]="empForm.invalid">Register</button>
+    </form>
+
+    <div *ngIf="submitted">
+      <h3>Registration Successful!</h3>
+      <p><b>Name:</b> {{ empForm.value.name }}</p>
+      <p><b>Email:</b> {{ empForm.value.email }}</p>
+      <p><b>Department:</b> {{ empForm.value.department }}</p>
+    </div>
+  `
+})
+class AppComponent {
+  empForm = new FormGroup({
+    name: new FormControl('', Validators.required),
+    email: new FormControl('', [Validators.required, emailValidator]),
+    department: new FormControl('HR', Validators.required)
+  });
+
+  submitted = false;
+}
+
+bootstrapApplication(AppComponent);
+
+----------------------------------------------
+
+Book Component with Custom Service
+import { Component, Injectable, inject } from '@angular/core';
+import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
+
+// Book Service to Fetch Data
+@Injectable({ providedIn: 'root' })
+class BookService {
+  getBooks() {
+    return [
+      { id: 1, name: "The Great Gatsby" },
+      { id: 2, name: "1984" },
+      { id: 3, name: "To Kill a Mockingbird" },
+      { id: 4, name: "The Catcher in the Rye" }
+    ];
+  }
+}
+
+// Book Component
+@Component({
+  selector: 'book-list',
+  standalone: true,
+  imports: [BrowserModule],
+  template: `
+    <h2>Book List</h2>
+    <ul>
+      <li *ngFor="let book of books">{{ book.id }} - {{ book.name }}</li>
+    </ul>
+  `
+})
+class BookComponent {
+  books = inject(BookService).getBooks(); // Fetching books using service
+}
+
+// Bootstrap Application
+bootstrapApplication(BookComponent);
+
+
+
+--------------------------------------------------------
+
+main.ts (Using Observables in Angular)
+
+import { Component, Injectable, inject } from '@angular/core';
+import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
+import { Observable } from 'rxjs';
+
+// Book Service with Observable
+@Injectable({ providedIn: 'root' })
+class BookService {
+  getBooks(): Observable<string> {
+    return new Observable(observer => {
+      const books = ["The Great Gatsby", "1984", "To Kill a Mockingbird", "The Catcher in the Rye"];
+      let index = 0;
+
+      setInterval(() => {
+        if (index < books.length) {
+          observer.next(books[index]); // Emit book name
+          index++;
+        } else {
+          observer.complete(); // Complete the observable
         }
-        text[i] = ch;  // Store modified character
-    }
-
-    printf("Decrypted message: %s", text);
-    return 0;
+      }, 2000);
+    });
+  }
 }
 
------------------------------------------------------------------------------------
-#include <stdio.h>
-#include <string.h>
+// Book Component
+@Component({
+  selector: 'book-list',
+  standalone: true,
+  imports: [BrowserModule],
+  template: `
+    <h2>Book Stream (Using Observables)</h2>
+    <ul>
+      <li *ngFor="let book of books">{{ book }}</li>
+    </ul>
+  `
+})
+class BookComponent {
+  books: string[] = [];
+  bookService = inject(BookService);
 
-// Mapping for Mono-Alphabetic Substitution Cipher
-char alpha[26][2] = { 
-    {'a', 'f'}, {'b', 'a'}, {'c', 'g'}, {'d', 'u'}, {'e', 'n'}, {'f', 'i'}, {'g', 'j'}, {'h', 'k'}, {'i', 'l'}, 
-    {'j', 'm'}, {'k', 'o'}, {'l', 'p'}, {'m', 'q'}, {'n', 'r'}, {'o', 's'}, {'p', 't'}, {'q', 'v'}, {'r', 'w'}, 
-    {'s', 'x'}, {'t', 'y'}, {'u', 'z'}, {'v', 'b'}, {'w', 'c'}, {'x', 'd'}, {'y', 'e'}, {'z', 'h'} 
-};
-
-// Encryption function
-char encrypt_char(char a) {
-    for (int i = 0; i < 26; i++) {
-        if (a == alpha[i][0])
-            return alpha[i][1];
-    }
-    return a;  // Return unchanged if not found
+  constructor() {
+    this.bookService.getBooks().subscribe({
+      next: (book) => this.books.push(book), // Add book to list
+      complete: () => console.log("Book list complete") // Log when done
+    });
+  }
 }
 
-// Decryption function
-char decrypt_char(char a) {
-    for (int i = 0; i < 26; i++) {
-        if (a == alpha[i][1])
-            return alpha[i][0];
-    }
-    return a;
+// Bootstrap Application
+bootstrapApplication(BookComponent);
+
+
+
+
+
+
+
+
+
+------------------------------------------------------
+http communication
+import { Component, Injectable, inject } from '@angular/core';
+import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+
+// Book Service for Server Communication
+@Injectable({ providedIn: 'root' })
+class BookService {
+  constructor(private http: HttpClient) {} 
+
+  getBooks() {
+    return this.http.get<any[]>('https://jsonplaceholder.typicode.com/posts'); // Mock API
+  }
 }
 
-int main() {
-    char str[100], encrypted[100], decrypted[100];
+// Book Component
+@Component({
+  selector: 'book-list',
+  standalone: true,
+  imports: [BrowserModule, HttpClientModule],
+  template: `
+    <h2>Book List (Fetched from Server)</h2>
+    <ul>
+      <li *ngFor="let book of books">{{ book.id }} - {{ book.title }}</li>
+    </ul>
+  `
+})
+class BookComponent {
+  books: any[] = [];
+  bookService = inject(BookService);
 
-    printf("Enter a string to encrypt: ");
-    fgets(str, sizeof(str), stdin);
-    str[strcspn(str, "\n")] = '\0';  // Remove newline character
-
-    // Encryption
-    for (int i = 0; str[i]; i++) {
-        encrypted[i] = encrypt_char(str[i]);
-    }
-    encrypted[strlen(str)] = '\0';
-
-    // Decryption
-    for (int i = 0; encrypted[i]; i++) {
-        decrypted[i] = decrypt_char(encrypted[i]);
-    }
-    decrypted[strlen(encrypted)] = '\0';
-
-    printf("Original Text  : %s\n", str);
-    printf("Encrypted Text : %s\n", encrypted);
-    printf("Decrypted Text : %s\n", decrypted);
-
-    return 0;
-}
-------------------------------------------------------------------------------------
-
-
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-
-int main() {
-    char plaintext[100], key[100], ciphertext[100], decrypted[100];
-    int i, len;
-
-    printf("Enter plaintext (UPPERCASE, no spaces): ");
-    scanf("%s", plaintext);
-    printf("Enter key (SAME length as plaintext): ");
-    scanf("%s", key);
-
-    len = strlen(plaintext);
-
-    // Encryption
-    for (i = 0; i < len; i++) {
-        ciphertext[i] = ((plaintext[i] - 'A' + key[i] - 'A') % 26) + 'A';
-    }
-    ciphertext[len] = '\0';
-
-    printf("Encrypted Text: %s\n", ciphertext);
-
-    // Decryption
-    for (i = 0; i < len; i++) {
-        decrypted[i] = ((ciphertext[i] - 'A' - (key[i] - 'A') + 26) % 26) + 'A';
-    }
-    decrypted[len] = '\0';
-
-    printf("Decrypted Text: %s\n", decrypted);
-
-    return 0;
-}
-----------------------------------------------------------------------------
-#include <stdio.h>
-#include <string.h>
-
-void vernamCipher(char *input, char *key, char *output) {
-    for (int i = 0; input[i] != '\0'; i++) {
-        output[i] = input[i] ^ key[i];  // XOR operation
-    }
-    output[strlen(input)] = '\0';  // Null terminate
+  constructor() {
+    this.bookService.getBooks().subscribe(data => this.books = data.slice(0, 5)); // Fetch and display first 5 books
+  }
 }
 
-int main() {
-    char plaintext[100], key[100], ciphertext[100], decrypted[100];
-
-    printf("Enter Plaintext: ");
-    scanf("%s", plaintext);
-    
-    printf("Enter Key (same length as plaintext): ");
-    scanf("%s", key);
-
-    if (strlen(plaintext) != strlen(key)) {
-        printf("Error: Key length must match plaintext length.\n");
-        return 1;
-    }
-
-    // Encrypt
-    vernamCipher(plaintext, key, ciphertext);
-    printf("Ciphertext: ");
-    for (int i = 0; i < strlen(ciphertext); i++) {
-        printf("%02X ", (unsigned char)ciphertext[i]);  // Print as hex
-    }
-    printf("\n");
-
-    // Decrypt
-    vernamCipher(ciphertext, key, decrypted);
-    printf("Decrypted Text: %s\n", decrypted);
-
-    return 0;
-}
-
----------------------------------------------------------------------------------------
-#include <stdio.h>
-#include <math.h>
-RSA Algorithm in C
-// Function to compute GCD
-int gcd(int a, int b) {
-    while (b != 0) {
-        int temp = b;
-        b = a % b;
-        a = temp;
-    }
-    return a;
-}
-
-// Function t	o compute (base^exp) % mod
-long long power_mod(long long base, long long exp, long long mod) {
-    long long result = 1;
-    while (exp > 0) {
-        if (exp % 2 == 1) {  // If exp is odd, multiply base
-            result = (result * base) % mod;
-        }
-        base = (base * base) % mod;
-        exp /= 2;
-    }
-    return result;
-}
-
-int main() {
-    // Choose two prime numbers
-    int p = 3, q = 7;
-    int n = p * q;  // Compute n
-    int totient = (p - 1) * (q - 1);  // Compute totient
-
-    // Choose public key exponent e (must be coprime with totient)
-    int e = 2;
-    while (gcd(e, totient) != 1) {
-        e++;
-    }
-
-    // Compute private key d (modular inverse of e)
-    int d = 1;
-    while ((d * e) % totient != 1) {
-        d++;
-    }
-
-    // Message to encrypt
-    int msg = 12;
-    
-    // Encryption: c = (msg^e) % n
-    int c = power_mod(msg, e, n);
-
-    // Decryption: m = (c^d) % n
-    int m = power_mod(c, d, n);
-
-    // Print results
-    printf("Message: %d\n", msg);
-    printf("p = %d, q = %d\n", p, q);
-    printf("n = %d\n", n);
-    printf("Totient = %d\n", totient);
-    printf("Public Key (e) = %d\n", e);
-    printf("Private Key (d) = %d\n", d);
-    printf("Encrypted Data (Ciphertext) = %d\n", c);
-    printf("Decrypted Message = %d\n", m);
-
-    return 0;
-}
--------------------------------------------------------------------------------------
- Diffie-Hellman Key Exchange in C
-#include <stdio.h>
-
-// Function to compute (base^exp) % mod efficiently
-long long power_mod(long long base, long long exp, long long mod) {
-    long long result = 1;
-    while (exp > 0) {
-        if (exp % 2 == 1) {  // If exp is odd, multiply base
-            result = (result * base) % mod;
-        }
-        base = (base * base) % mod;
-        exp /= 2;
-    }
-    return result;
-}
-
-int main() {
-    long long P = 23, G = 9; // Public keys (Prime number & Primitive root)
-    long long a = 4, b = 3;  // Private keys chosen by Alice & Bob
-
-    printf("Public keys: P = %lld, G = %lld\n", P, G);
-    printf("Alice's private key: %lld\n", a);
-    printf("Bob's private key: %lld\n\n", b);
-
-    // Compute public keys to exchange
-    long long A = power_mod(G, a, P); // Alice's public key
-    long long B = power_mod(G, b, P); // Bob's public key
-
-    printf("Alice's public key (A) = %lld\n", A);
-    printf("Bob's public key (B) = %lld\n\n", B);
-
-    // Compute shared secret key
-    long long secret_Alice = power_mod(B, a, P); // Secret key for Alice
-    long long secret_Bob = power_mod(A, b, P);   // Secret key for Bob
-
-    printf("Secret key for Alice: %lld\n", secret_Alice);
-    printf("Secret key for Bob: %lld\n", secret_Bob);
-
-    return 0;
-}
-
-
---------------------------------------------------
-Simple ElGamal Cryptosystem in C
-#include <stdio.h>
-
-// Function to compute (base^exp) % mod efficiently
-long long power_mod(long long base, long long exp, long long mod) {
-    long long result = 1;
-    while (exp > 0) {
-        if (exp % 2 == 1) {  // If exp is odd, multiply base
-            result = (result * base) % mod;
-        }
-        base = (base * base) % mod;
-        exp /= 2;
-    }
-    return result;
-}
-
-int main() {
-    long long p = 23, g = 5; // Public prime and generator
-    long long x = 6;  // Private key (chosen by receiver)
-    
-    // Compute public key
-    long long y = power_mod(g, x, p);
-    
-    printf("Public key: (p = %lld, g = %lld, y = %lld)\n", p, g, y);
-    printf("Private key (x): %lld\n\n", x);
-    
-    // Encryption
-    long long msg = 10; // Original message
-    long long k = 3;  // Random secret integer
-    long long c1 = power_mod(g, k, p);
-    long long c2 = (msg * power_mod(y, k, p)) % p;
-    
-    printf("Original Message: %lld\n", msg);
-    printf("Encrypted values: (c1 = %lld, c2 = %lld)\n\n", c1, c2);
-    
-    // Decryption
-    long long key = power_mod(c1, x, p);
-    long long decrypted_msg = (c2 * power_mod(key, p - 2, p)) % p; // Modular inverse
-    
-    printf("Decrypted Message: %lld\n", decrypted_msg);
-
-    return 0;
-}
-
-
--------------------------------------------
-------------------------------------------
-sentence reversal
-import java.io.*;  
-import java.net.*;  
-
-public class ReverseServer {  
-    public static void main(String[] args) throws IOException {  
-        ServerSocket server = new ServerSocket(1234);  
-        System.out.println("Server running... Waiting for clients.");  
-
-        while (true) {  
-            Socket client = server.accept();  
-            BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));  
-            PrintWriter out = new PrintWriter(client.getOutputStream(), true);  
-
-            String input = in.readLine();  
-            System.out.println("Client: " + input);  
-
-            String reversed = new StringBuilder(input).reverse().toString();  
-            out.println(reversed);  
-
-            client.close();  
-        }  
-    }  
-}
-
-import java.io.*;  
-import java.net.*;  
-
-public class ReverseClient {  
-    public static void main(String[] args) throws IOException {  
-        Socket socket = new Socket("localhost", 1234);  
-        BufferedReader userIn = new BufferedReader(new InputStreamReader(System.in));  
-        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);  
-        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));  
-
-        System.out.print("Enter sentence: ");  
-        String sentence = userIn.readLine();  
-        out.println(sentence);  
-
-        System.out.println("Reversed: " + in.readLine());  
-        socket.close();  
-    }  
-}
-----------------------------------------------------------------
-
-transfer file
-import java.io.*;  
-import java.net.*;  
-
-public class FileServer {  
-    public static void main(String[] args) throws IOException {  
-        ServerSocket server = new ServerSocket(5000);  
-        System.out.println("Waiting for connection...");  
-
-        Socket client = server.accept();  
-        System.out.println("Client connected.");  
-
-        // Create a sample file dynamically
-        String fileName = "sample.txt";
-        FileWriter writer = new FileWriter(fileName);
-        writer.write("This is a test file sent from server.");
-        writer.close();
-
-        // Send the file
-        FileInputStream fileIn = new FileInputStream(fileName);  
-        OutputStream out = client.getOutputStream();  
-        byte[] buffer = new byte[4096];  
-        int bytesRead;  
-        while ((bytesRead = fileIn.read(buffer)) != -1) {  
-            out.write(buffer, 0, bytesRead);  
-        }  
-
-        System.out.println("File sent.");  
-        fileIn.close();  
-        client.close();  
-        server.close();  
-    }  
-}
-
-
-import java.io.*;  
-import java.net.*;  
-
-public class FileClient {  
-    public static void main(String[] args) throws IOException {  
-        Socket socket = new Socket("127.0.0.1", 5000);  
-        InputStream in = socket.getInputStream();  
-        FileOutputStream fileOut = new FileOutputStream("received.txt");  
-
-        byte[] buffer = new byte[4096];  
-        int bytesRead;  
-        while ((bytesRead = in.read(buffer)) != -1) {  
-            fileOut.write(buffer, 0, bytesRead);  
-        }  
-
-        System.out.println("File received.");  
-        fileOut.close();  
-        socket.close();  
-    }  
-}
-
-
---------------------------------------------------------------
-select
-import java.io.*;
-import java.net.*;
-import java.nio.*;
-import java.nio.channels.*;
-import java.util.*;
-
-public class TCPConcurrentServerUpper {
-    public static void main(String[] args) throws IOException {
-        Selector selector = Selector.open();
-        ServerSocketChannel server = ServerSocketChannel.open();
-        server.bind(new InetSocketAddress(5000));
-        server.configureBlocking(false);
-        server.register(selector, SelectionKey.OP_ACCEPT);
-        System.out.println("Server running...");
-
-        while (true) {
-            selector.select();
-            Iterator<SelectionKey> keys = selector.selectedKeys().iterator();
-            while (keys.hasNext()) {
-                SelectionKey key = keys.next();
-                keys.remove();
-
-                if (key.isAcceptable()) {
-                    SocketChannel client = server.accept();
-                    client.configureBlocking(false);
-                    client.register(selector, SelectionKey.OP_READ);
-                } 
-                else if (key.isReadable()) {
-                    SocketChannel client = (SocketChannel) key.channel();
-                    ByteBuffer buffer = ByteBuffer.allocate(1024);
-                    if (client.read(buffer) == -1) { client.close(); continue; }
-                    buffer.flip();
-                    String msg = new String(buffer.array(), 0, buffer.limit()).toUpperCase();
-                    client.write(ByteBuffer.wrap(msg.getBytes()));
-                }
-            }
-        }
-    }
-}
-
-
-import java.io.*;
-import java.net.*;
-import java.nio.*;
-import java.nio.channels.*;
-import java.util.Scanner;
-
-public class TCPClientUpper {
-    public static void main(String[] args) throws IOException {
-        SocketChannel client = SocketChannel.open(new InetSocketAddress("localhost", 5000));
-        ByteBuffer buffer = ByteBuffer.allocate(1024);
-        Scanner scanner = new Scanner(System.in);
-
-        while (true) {
-            System.out.print("Enter text (or 'exit' to quit): ");
-            String msg = scanner.nextLine();
-            if (msg.equalsIgnoreCase("exit")) break;
-
-            buffer.clear();
-            buffer.put(msg.getBytes());
-            buffer.flip();
-            client.write(buffer);
-
-            buffer.clear();
-            client.read(buffer);
-            buffer.flip();
-            System.out.println("Server: " + new String(buffer.array(), 0, buffer.limit()));
-        }
-        
-        client.close();
-        scanner.close();
-    }
-}
-
-----------------------------------------------------------------------------------------
-poll
-import java.io.*;
-import java.net.*;
-import java.nio.*;
-import java.nio.channels.*;
-import java.util.*;
-
-public class TCPConcurrentPollServer {
-    public static void main(String[] args) throws IOException {
-        ServerSocketChannel server = ServerSocketChannel.open();
-        server.bind(new InetSocketAddress(12345));
-        server.configureBlocking(false);
-        
-        Selector selector = Selector.open();
-        server.register(selector, SelectionKey.OP_ACCEPT);
-        System.out.println("Server running...");
-
-        while (true) {
-            selector.select();
-            Iterator<SelectionKey> keys = selector.selectedKeys().iterator();
-            while (keys.hasNext()) {
-                SelectionKey key = keys.next();
-                keys.remove();
-
-                if (key.isAcceptable()) {
-                    SocketChannel client = server.accept();
-                    client.configureBlocking(false);
-                    client.register(selector, SelectionKey.OP_READ);
-                    System.out.println("Client connected: " + client.getRemoteAddress());
-                } 
-                else if (key.isReadable()) {
-                    SocketChannel client = (SocketChannel) key.channel();
-                    ByteBuffer buffer = ByteBuffer.allocate(1024);
-                    int bytesRead = client.read(buffer);
-                    if (bytesRead == -1) {
-                        client.close();
-                        System.out.println("Client disconnected");
-                    } else {
-                        buffer.flip();
-                        client.write(buffer); // Echoing back
-                        buffer.clear();
-                    }
-                }
-            }
-        }
-    }
-}
-
-
-import java.io.*;
-import java.net.*;
-import java.nio.*;
-import java.nio.channels.*;
-import java.util.Scanner;
-
-public class TCPClientPoll {
-    public static void main(String[] args) throws IOException {
-        SocketChannel client = SocketChannel.open(new InetSocketAddress("localhost", 12345));
-        ByteBuffer buffer = ByteBuffer.allocate(1024);
-        Scanner scanner = new Scanner(System.in);
-
-        while (true) {
-            System.out.print("Enter message (or 'exit' to quit): ");
-            String msg = scanner.nextLine();
-            if (msg.equalsIgnoreCase("exit")) break;
-
-            buffer.clear();
-            buffer.put(msg.getBytes());
-            buffer.flip();
-            client.write(buffer);
-
-            buffer.clear();
-            client.read(buffer);
-            buffer.flip();
-            System.out.println("Echo from server: " + new String(buffer.array(), 0, buffer.limit()));
-        }
-        
-        client.close();
-        scanner.close();
-    }
-}
-
-
-
-
-
-
-
-
-
--------------------------------------------------------------------------
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-
-int main() {
-    int fd[2];  // Pipe file descriptors
-    char buffer[100];
-
-    if (pipe(fd) == -1) {
-        perror("Pipe creation failed");
-        exit(1);
-    }
-
-    if (fork() == 0) {  // Child process
-        close(fd[0]);  // Close read end
-        write(fd[1], "Hello from child!", 17);
-        close(fd[1]);  // Close write end
-    } else {  // Parent process
-        close(fd[1]);  // Close write end
-        read(fd[0], buffer, sizeof(buffer));
-        printf("Parent received: %s\n", buffer);
-        close(fd[0]);  // Close read end
-    }
-
-    return 0;
-}
-
-
-
-
-
-
-
-
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <unistd.h>
-
-int main() {
-    char buffer[100];
-    mkfifo("mypipe", 0666);  // Create FIFO
-
-    int fd = open("mypipe", O_RDONLY);  // Open FIFO for reading
-    read(fd, buffer, sizeof(buffer));
-    printf("Server received: %s\n", buffer);
-    close(fd);
-
-    return 0;
-}
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <unistd.h>
-
-int main() {
-    int fd = open("mypipe", O_WRONLY);  // Open FIFO for writing
-    write(fd, "Hello FIFO!", 11);
-    close(fd);
-
-    return 0;
-}
--------------------------------------------------------------------------------
-import java.net.*;
-reverese sentence udp
-
-public class ReverseUDPServer {
-    public static void main(String[] args) throws Exception {
-        DatagramSocket server = new DatagramSocket(1234);
-        byte[] buf = new byte[1024];
-
-        while (true) {
-            DatagramPacket packet = new DatagramPacket(buf, buf.length);
-            server.receive(packet);
-
-            String input = new String(packet.getData(), 0, packet.getLength());
-            String reversed = new StringBuilder(input).reverse().toString();
-
-            packet.setData(reversed.getBytes());
-            server.send(packet);
-        }
-    }
-}
-
-import java.net.*;
-import java.util.Scanner;
-
-public class ReverseUDPClient {
-    public static void main(String[] args) throws Exception {
-        DatagramSocket client = new DatagramSocket();
-        InetAddress address = InetAddress.getByName("localhost");
-        byte[] buf = new byte[1024];
-
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter sentence: ");
-        String sentence = scanner.nextLine();
-        
-        DatagramPacket packet = new DatagramPacket(sentence.getBytes(), sentence.length(), address, 1234);
-        client.send(packet);
-
-        packet = new DatagramPacket(buf, buf.length);
-        client.receive(packet);
-
-        System.out.println("Reversed: " + new String(packet.getData(), 0, packet.getLength()));
-
-        client.close();
-    }
-}
-
-
-
-
-
----------------------------------------------------------------------------
-file transfer udp
-import java.io.*;
-import java.net.*;
-
-public class FileUDPServer {
-    public static void main(String[] args) throws Exception {
-        DatagramSocket server = new DatagramSocket(5000);
-        byte[] buffer = new byte[4096];
-
-        FileInputStream fileIn = new FileInputStream("sample.txt");
-        InetAddress clientIP = InetAddress.getByName("127.0.0.1");
-
-        int bytesRead;
-        while ((bytesRead = fileIn.read(buffer)) != -1) 
-            server.send(new DatagramPacket(buffer, bytesRead, clientIP, 5001));
-
-        server.send(new DatagramPacket("END".getBytes(), 3, clientIP, 5001));
-
-        fileIn.close();
-        server.close();
-    }
-}
-
-import java.io.*;
-import java.net.*;
-
-public class FileUDPClient {
-    public static void main(String[] args) throws Exception {
-        DatagramSocket client = new DatagramSocket(5001);
-        byte[] buffer = new byte[4096];
-        FileOutputStream fileOut = new FileOutputStream("received.txt");
-
-        while (true) {
-            DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-            client.receive(packet);
-            if (new String(packet.getData(), 0, packet.getLength()).equals("END")) break;
-            fileOut.write(packet.getData(), 0, packet.getLength());
-        }
-
-        fileOut.close();
-        client.close();
-    }
-}
------------------------------------------------------------------------------
-    add and sub
-import java.rmi.registry.*;
-
-public class CalculatorServer {
-    public static void main(String[] args) {
-        try {
-            CalculatorImpl calc = new CalculatorImpl();
-            LocateRegistry.createRegistry(1099).rebind("CalculatorService", calc);
-            System.out.println("Server is running...");
-        } catch (Exception e) { e.printStackTrace(); }
-    }
-}
-
-import java.rmi.registry.*;
-
-public class CalculatorClient {
-    public static void main(String[] args) {
-        try {
-            Calculator calc = (Calculator) LocateRegistry.getRegistry(1099).lookup("CalculatorService");
-            System.out.println("Addition: " + calc.add(10, 5));
-            System.out.println("Subtraction: " + calc.subtract(10, 5));
-        } catch (Exception e) { e.printStackTrace(); }
-    }
-}
-
+// Bootstrap Application
+bootstrapApplication(BookComponent);
+
+-----------------------------------------------
+Multiple Components with Routing
+import { Component } from '@angular/core';
+import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
+import { RouterModule } from '@angular/router';
+
+// Home Component
+@Component({
+  selector: 'app-home',
+  standalone: true,
+  template: `<h2>Home Page</h2><p>Welcome to our website!</p>`
+})
+class HomeComponent {}
+
+// About Component
+@Component({
+  selector: 'app-about',
+  standalone: true,
+  template: `<h2>About Page</h2><p>This is a simple Angular routing example.</p>`
+})
+class AboutComponent {}
+
+// Main App Component
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [BrowserModule, RouterModule.forRoot([
+    { path: '', component: HomeComponent },
+    { path: 'about', component: AboutComponent }
+  ])],
+  template: `
+    <h1>Angular Routing Example</h1>
+    <nav>
+      <a routerLink="/">Home</a> | 
+      <a routerLink="/about">About</a>
+    </nav>
+    <router-outlet></router-outlet>
+  `
+})
+class AppComponent {}
+
+// Bootstrap Application
+bootstrapApplication(AppComponent);
 
