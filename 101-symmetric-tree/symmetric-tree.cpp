@@ -622,3 +622,174 @@ public class TCPClientPoll {
         scanner.close();
     }
 }
+
+
+
+
+
+
+
+
+
+-------------------------------------------------------------------------
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+int main() {
+    int fd[2];  // Pipe file descriptors
+    char buffer[100];
+
+    if (pipe(fd) == -1) {
+        perror("Pipe creation failed");
+        exit(1);
+    }
+
+    if (fork() == 0) {  // Child process
+        close(fd[0]);  // Close read end
+        write(fd[1], "Hello from child!", 17);
+        close(fd[1]);  // Close write end
+    } else {  // Parent process
+        close(fd[1]);  // Close write end
+        read(fd[0], buffer, sizeof(buffer));
+        printf("Parent received: %s\n", buffer);
+        close(fd[0]);  // Close read end
+    }
+
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main() {
+    char buffer[100];
+    mkfifo("mypipe", 0666);  // Create FIFO
+
+    int fd = open("mypipe", O_RDONLY);  // Open FIFO for reading
+    read(fd, buffer, sizeof(buffer));
+    printf("Server received: %s\n", buffer);
+    close(fd);
+
+    return 0;
+}
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+int main() {
+    int fd = open("mypipe", O_WRONLY);  // Open FIFO for writing
+    write(fd, "Hello FIFO!", 11);
+    close(fd);
+
+    return 0;
+}
+-------------------------------------------------------------------------------
+import java.net.*;
+reverese sentence udp
+
+public class ReverseUDPServer {
+    public static void main(String[] args) throws Exception {
+        DatagramSocket server = new DatagramSocket(1234);
+        byte[] buf = new byte[1024];
+
+        while (true) {
+            DatagramPacket packet = new DatagramPacket(buf, buf.length);
+            server.receive(packet);
+
+            String input = new String(packet.getData(), 0, packet.getLength());
+            String reversed = new StringBuilder(input).reverse().toString();
+
+            packet.setData(reversed.getBytes());
+            server.send(packet);
+        }
+    }
+}
+
+import java.net.*;
+import java.util.Scanner;
+
+public class ReverseUDPClient {
+    public static void main(String[] args) throws Exception {
+        DatagramSocket client = new DatagramSocket();
+        InetAddress address = InetAddress.getByName("localhost");
+        byte[] buf = new byte[1024];
+
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter sentence: ");
+        String sentence = scanner.nextLine();
+        
+        DatagramPacket packet = new DatagramPacket(sentence.getBytes(), sentence.length(), address, 1234);
+        client.send(packet);
+
+        packet = new DatagramPacket(buf, buf.length);
+        client.receive(packet);
+
+        System.out.println("Reversed: " + new String(packet.getData(), 0, packet.getLength()));
+
+        client.close();
+    }
+}
+
+
+
+
+
+---------------------------------------------------------------------------
+file transfer udp
+import java.io.*;
+import java.net.*;
+
+public class FileUDPServer {
+    public static void main(String[] args) throws Exception {
+        DatagramSocket server = new DatagramSocket(5000);
+        byte[] buffer = new byte[4096];
+
+        FileInputStream fileIn = new FileInputStream("sample.txt");
+        InetAddress clientIP = InetAddress.getByName("127.0.0.1");
+
+        int bytesRead;
+        while ((bytesRead = fileIn.read(buffer)) != -1) 
+            server.send(new DatagramPacket(buffer, bytesRead, clientIP, 5001));
+
+        server.send(new DatagramPacket("END".getBytes(), 3, clientIP, 5001));
+
+        fileIn.close();
+        server.close();
+    }
+}
+
+import java.io.*;
+import java.net.*;
+
+public class FileUDPClient {
+    public static void main(String[] args) throws Exception {
+        DatagramSocket client = new DatagramSocket(5001);
+        byte[] buffer = new byte[4096];
+        FileOutputStream fileOut = new FileOutputStream("received.txt");
+
+        while (true) {
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+            client.receive(packet);
+            if (new String(packet.getData(), 0, packet.getLength()).equals("END")) break;
+            fileOut.write(packet.getData(), 0, packet.getLength());
+        }
+
+        fileOut.close();
+        client.close();
+    }
+}
+
+
