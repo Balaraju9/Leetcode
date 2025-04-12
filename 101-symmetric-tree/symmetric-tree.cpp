@@ -445,9 +445,8 @@ class BookComponent {
 bootstrapApplication(BookComponent);
 
 -----------------------------------------------
-Multiple Components with Routing
-import { Component } from '@angular/core';
-import { BrowserModule, bootstrapApplication } from '@angular/platform-browser';
+import { Component, importProvidersFrom } from '@angular/core';
+import { bootstrapApplication } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
 
 // Home Component
@@ -470,10 +469,7 @@ class AboutComponent {}
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [BrowserModule, RouterModule.forRoot([
-    { path: '', component: HomeComponent },
-    { path: 'about', component: AboutComponent }
-  ])],
+  imports: [RouterModule],  
   template: `
     <h1>Angular Routing Example</h1>
     <nav>
@@ -485,6 +481,14 @@ class AboutComponent {}
 })
 class AppComponent {}
 
-// Bootstrap Application
-bootstrapApplication(AppComponent);
-
+// Bootstrap Application with Routing
+bootstrapApplication(AppComponent, {
+  providers: [
+    importProvidersFrom(
+      RouterModule.forRoot([
+        { path: '', component: HomeComponent },
+        { path: 'about', component: AboutComponent }
+      ])
+    )
+  ]
+});
