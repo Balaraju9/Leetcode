@@ -39,12 +39,12 @@ public:
     q = mp[q];
 }
 
-       for (auto &i : mp1) {
-    if (i.first)  
-        cout << i.first->val << " ";
-    else
-        cout << "NULL ";
-}
+//        for (auto &i : mp1) {
+//     if (i.first)  
+//         cout << i.first->val << " ";
+//     else
+//         cout << "NULL ";
+// }
 
         // for(auto &i:mp){
         //     if(i.first==p){cout<<"Pud";}
