@@ -18,10 +18,9 @@ public:
         return false;
     }
     int minDays(vector<int>& b, int m, int k) {
-    
+        if((long long)m*k>b.size()) return -1;
         int mind=*min_element(b.begin(),b.end());
         int maxd=*max_element(b.begin(),b.end());
-        int sul=maxd;
         while(mind<=maxd){
             int mid=(mind+maxd)/2;
             if(fun(mid,b,m,k)){
@@ -32,7 +31,6 @@ public:
 
             }
         }
-        if(mind>sul) return -1;
        return mind;
         
     }
