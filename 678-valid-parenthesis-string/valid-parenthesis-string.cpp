@@ -1,43 +1,49 @@
 class Solution {
 public:
     bool checkValidString(string s) {
-        int st=0,op=0,cl=0;
-        for(int i=0;i<s.size();i++){
-            if(s[i]=='*'){
-                st++;
-            }
-            else if(s[i]=='('){
-                op++;
-            }
-            else{
-                cl++;
-            }
-            if(op+st>=cl || op==cl){
 
+        int star=0;
+     
+        int c1=0,star1=star;
+        int c=0;
+        for(int i=0;i<s.size();i++){
+            if(s[i]=='('){
+                c++;
             }
-            else{
+            else if(s[i]=='*'){
+                star++;
+            }
+            else if(s[i]==')'){
+                c--;
+            }
+
+            if(c<0 && star>0){
+                c=0;
+                star--;
+            }
+            else if(c<0 && star<=0){
                 return false;
             }
         }
-         st=0,op=0,cl=0;
-        for(int i=s.size()-1;i>=0;i--){
-            if(s[i]=='*'){
-                st++;
+         for(int i=s.size()-1;i>=0;i--){
+            if(s[i]==')'){
+                c1++;
             }
-            else if(s[i]==')'){
-                op++;
+            else if(s[i]=='*'){
+                star1++;
             }
-            else{
-                cl++;
+            else if(s[i]=='('){
+                c1--;
             }
-            if(op+st>=cl || op==cl){
 
+            if(c1<0 && star1>0){
+                c1=0;
+                star1--;
             }
-            else{
+            else if(c1<0 && star1<=0){
                 return false;
             }
         }
         return true;
-        
     }
 };
