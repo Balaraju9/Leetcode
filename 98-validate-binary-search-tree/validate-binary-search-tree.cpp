@@ -11,29 +11,22 @@
  */
 class Solution {
 public:
-    vector<int> v1;
-    void fun(TreeNode* root){
-        if(root==NULL){
-            return;
+    bool fun(TreeNode* r,long long max1,long long min1){
+        if(r==NULL){
+            return true;
         }
-        fun(root->left);
-        v1.push_back(root->val);
-        fun(root->right);
+        if(!(r->val>min1 && r->val<max1)){
+            return false;
+        }
+
+        bool l=fun(r->left,r->val,min1);
+        bool ri=fun(r->right,max1,r->val);
+        return l&&ri;
 
     }
-    bool isValidBST(TreeNode* root) {
-        fun(root);
-       unordered_map<int,int> mp;
-       for(auto &i:v1){
-        mp[i]++;
-       }
-       vector<int> v2=v1;
-      
-       sort(v2.begin(),v2.end());
-       if(v1==v2 && v1.size()==mp.size()){
-        return true;
-       }
-       return false;
+    bool isValidBST(TreeNode* r) {
+        if(!r->left && !r->right) return true;
+        return fun(r,LLONG_MAX,LLONG_MIN);
         
     }
 };
