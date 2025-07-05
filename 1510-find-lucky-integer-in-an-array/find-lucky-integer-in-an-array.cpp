@@ -1,17 +1,19 @@
 class Solution {
 public:
-    int findLucky(vector<int>& ar) {
-        int max1=-1;
-        map<int,int> mp;
-        for(int i=0;i<ar.size();i++){
-            mp[ar[i]]++;
-        }
-        for(auto &i:mp){
-            if(i.first==i.second){
-                max1=max(i.second,max1);
+    int findLucky(vector<int>& arr) {
+        int hehe =-1;
+        sort(arr.begin(),arr.end());
+
+        for(int i=1;i<arr.size();i++){
+            int cnt = 1;
+            while(i<arr.size() && arr[i]==arr[i-1]){
+                cnt++;
+                ++i;
+            }
+            if(cnt==arr[i-1]){
+                hehe = arr[i-1];
             }
         }
-        return max1;
-        
+        return hehe;
     }
 };
