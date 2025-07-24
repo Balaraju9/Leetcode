@@ -1,33 +1,30 @@
 class Solution {
 public:
     vector<int> findMissingAndRepeatedValues(vector<vector<int>>& g) {
-        int pu=0;
+        int s=0,donga=0;
+        vector<int> v1(g[0].size() * g[0].size());
         for(int i=0;i<g.size();i++){
             for(int j=0;j<g[i].size();j++){
-                int k=abs(g[i][j]);
-                int i1=(k-1)/g.size();
-                int j1=(k-1)%g.size();
-                if(g[i1][j1]<0){
-                    pu=abs(g[i][j]);
-
+                int ind=g[i][j]-1;
+                if(v1[ind]<0){
+                    donga=g[i][j];
                 }
                 else{
-                    g[i1][j1]=-1*g[i1][j1];
+                    v1[ind]=-1;
+                   
                 }
+                s+=g[i][j];
             }
         }
-        for(int i=0;i<g.size();i++){
-            for(int j=0;j<g[i].size();j++){
-                if(g[i][j]>0){
-                    vector<int> v1={pu,  static_cast<int>(i*g.size())+(j+1)};
 
-                    return v1; 
-
-                }
-            }
-        }
-        return {};
-
+        s=s-donga;
+        int n=v1.size();
+       int tot=(n*(n+1))/2;
+       tot=tot-s;
+        // tot=tot-s;
+        // cout<<s<<" "<<tot;
+        return {donga,tot};
+        
         
     }
 };
